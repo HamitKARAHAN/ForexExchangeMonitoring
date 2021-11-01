@@ -8,41 +8,44 @@ using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
-
+using ForexExchange.DB;
 namespace ForexExchange.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+ 
+        private readonly RTCExchangeRateContext _dbContext;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(RTCExchangeRateContext dbContext)
         {
-            _logger = logger;
+            _dbContext = dbContext;
         }
+
+
 
         public IActionResult Index()
         {
             string QUERY_URL = "https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=JPY&apikey=1QHQEJN8ATXPVNI4";
             Uri queryUri = new Uri(QUERY_URL);
-            Dictionary<string, object> model1=new Dictionary<string, object>();
             using (WebClient client = new WebClient())
             {
                 dynamic json_data = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(client.DownloadString(queryUri));
-                model1 = json_data;
-                
 
-                var nameOfProperty = "1. From_Currency Code";
-
-
-
-
-                foreach (var item in model1)
+                RealTimeCurrencyExchangeRate rt;
+                foreach (var item in json_data.Values)
                 {
-                    var propertyInfo = item.Value.GetType().GetProperty(nameOfProperty);
-                    var value = propertyInfo.GetValue(item.Value, null);
+                    rt = new RealTimeCurrencyExchangeRate
+                    {
+                        FromCurrencyCode = item.GetProperty("1. From_Currency Code").ToString(),
+                        ToCurrencyCode = item.GetProperty("3. To_Currency Code").ToString(),
+                        LastRefreshedDate = Convert.ToDateTime(item.GetProperty("6. Last Refreshed").ToString())
+                    };
+
+                    _dbContext.RealTimeCurrencyExchangeRates.Add(rt);
+                    _dbContext.SaveChanges();
                 }
             }
-            return View(model1);
+            return View();
         }
 
 

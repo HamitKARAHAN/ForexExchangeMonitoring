@@ -12,6 +12,6 @@ namespace ForexExchange.DB
         public RTCExchangeRateContext(DbContextOptions options) : base (options)
         {
         }
-        DbSet<RealTimeCurrencyExchangeRate> RealTimeCurrencyExchangeRate { get; set; }
+        public DbSet<RealTimeCurrencyExchangeRate> RealTimeCurrencyExchangeRates { get; set; }
     }
 }

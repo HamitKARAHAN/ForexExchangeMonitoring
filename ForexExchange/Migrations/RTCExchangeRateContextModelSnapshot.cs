@@ -21,23 +21,23 @@ namespace ForexExchange.Migrations
 
             modelBuilder.Entity("ForexExchange.Models.RealTimeCurrencyExchangeRate", b =>
                 {
-                    b.Property<int>("CurrencyId")
+                    b.Property<int>("RealTimeCurrencyExchangeRateId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("CurrencyName")
+                    b.Property<string>("FromCurrencyCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LastModifiedDate")
+                    b.Property<DateTime>("LastRefreshedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("Rate")
-                        .HasColumnType("bigint");
+                    b.Property<string>("ToCurrencyCode")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("CurrencyId");
+                    b.HasKey("RealTimeCurrencyExchangeRateId");
 
-                    b.ToTable("RealTimeCurrencyExchangeRate");
+                    b.ToTable("RealTimeCurrencyExchangeRates");
                 });
 #pragma warning restore 612, 618
         }

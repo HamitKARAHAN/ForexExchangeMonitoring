@@ -8,11 +8,9 @@ namespace ForexExchange.Models
 {
     public class RealTimeCurrencyExchangeRate
     {
-        [Key]
-        public int CurrencyId { get; set; }
-        public string CurrencyName { get; set; }
-        public long Rate { get; set; }
-        public DateTime LastModifiedDate { get; set; }
-
+        public int RealTimeCurrencyExchangeRateId { get; set; }
+        public string FromCurrencyCode{ get; set; }
+        public string ToCurrencyCode { get; set; }
+        public DateTime LastRefreshedDate { get; set; }
     }
 }
