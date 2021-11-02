@@ -1,4 +1,4 @@
-﻿using ForexExchangeMonitoring.Domain;
+﻿using ForexExchangeMonitoring.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 

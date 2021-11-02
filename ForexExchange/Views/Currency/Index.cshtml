@@ -1,0 +1,27 @@
+﻿@model ForexExchangeMonitoring.Application.ViewModels.ForexCurrencyViewModel
+
+
+<table id="currency" class="table table-bordered table-hover">
+    <thead>
+        <tr class="">
+            <th>Currency</th>
+            <th>Rate</th>
+            <th>Last Modified Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Currencies)
+        {
+            <tr style="height:60px;">
+                <td>@item.FromCurrencyCode / @item.ToCurrencyCode</td>
+                <td>@item.ExchangeRate</td>
+                <td>@item.LastRefreshedDate</td>
+            </tr>
+        }
+
+    </tbody>
+
+
+
+</table>
+

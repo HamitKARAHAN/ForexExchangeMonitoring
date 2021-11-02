@@ -15,6 +15,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FromCurrencyCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ToCurrencyCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExchangeRate = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastRefreshedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>

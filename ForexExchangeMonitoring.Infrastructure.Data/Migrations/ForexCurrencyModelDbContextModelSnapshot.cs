@@ -19,12 +19,15 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
                 .HasAnnotation("ProductVersion", "5.0.11")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("ForexExchangeMonitoring.Domain.ForexCurrencyModel", b =>
+            modelBuilder.Entity("ForexExchangeMonitoring.Domain.Models.ForexCurrencyModel", b =>
                 {
                     b.Property<int>("ForexCurrencyModelId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ExchangeRate")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FromCurrencyCode")
                         .HasColumnType("nvarchar(max)");

@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ForexExchangeMonitoring.Infrastructure.Data\ForexExchangeMonitoring.Infrastructure.Data.csproj" />
+    <ProjectReference Include="..\ForexExchangeMonitoring.Ioc\ForexExchangeMonitoring.Ioc.csproj" />
   </ItemGroup>
 
 </Project>
