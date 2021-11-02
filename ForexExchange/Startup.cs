@@ -1,4 +1,4 @@
-using ForexExchange.DB;
+using ForexExchangeMonitoring.Infrastructure.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -26,7 +26,11 @@ namespace ForexExchange
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddDbContext<RTCExchangeRateContext>(item => item.UseSqlServer(Configuration.GetConnectionString("myconn")));
+            services.AddDbContext<ForexCurrencyModelDbContext>(options =>
+            {
+                options.UseSqlServer(
+                Configuration.GetConnectionString("myconn"));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

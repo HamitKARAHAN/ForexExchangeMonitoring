@@ -1,4 +1,5 @@
-﻿using ForexExchange.Models;
+﻿
+using ForexExchangeMonitoring.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -8,15 +9,15 @@ using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
-using ForexExchange.DB;
+
 namespace ForexExchange.Controllers
 {
     public class HomeController : Controller
     {
- 
-        private readonly RTCExchangeRateContext _dbContext;
 
-        public HomeController(RTCExchangeRateContext dbContext)
+        private readonly ForexCurrencyModelDbContext _dbContext;
+
+        public HomeController(ForexCurrencyModelDbContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -31,19 +32,19 @@ namespace ForexExchange.Controllers
             {
                 dynamic json_data = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(client.DownloadString(queryUri));
 
-                RealTimeCurrencyExchangeRate rt;
-                foreach (var item in json_data.Values)
-                {
-                    rt = new RealTimeCurrencyExchangeRate
-                    {
-                        FromCurrencyCode = item.GetProperty("1. From_Currency Code").ToString(),
-                        ToCurrencyCode = item.GetProperty("3. To_Currency Code").ToString(),
-                        LastRefreshedDate = Convert.ToDateTime(item.GetProperty("6. Last Refreshed").ToString())
-                    };
+                //RealTimeCurrencyExchangeRate rt;
+                //foreach (var item in json_data.Values)
+                //{
+                //    rt = new RealTimeCurrencyExchangeRate
+                //    {
+                //        FromCurrencyCode = item.GetProperty("1. From_Currency Code").ToString(),
+                //        ToCurrencyCode = item.GetProperty("3. To_Currency Code").ToString(),
+                //        LastRefreshedDate = Convert.ToDateTime(item.GetProperty("6. Last Refreshed").ToString())
+                //    };
 
-                    _dbContext.RealTimeCurrencyExchangeRates.Add(rt);
-                    _dbContext.SaveChanges();
-                }
+                //    _dbContext.RealTimeCurrencyExchangeRates.Add(rt);
+                //    _dbContext.SaveChanges();
+               // }
             }
             return View();
         }

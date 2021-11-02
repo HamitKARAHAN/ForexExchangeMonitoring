@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace ForexExchange.Migrations
+namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
 {
-    public partial class initial : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -11,7 +11,7 @@ namespace ForexExchange.Migrations
                 name: "RealTimeCurrencyExchangeRates",
                 columns: table => new
                 {
-                    RealTimeCurrencyExchangeRateId = table.Column<int>(type: "int", nullable: false)
+                    ForexCurrencyModelId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FromCurrencyCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ToCurrencyCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -19,7 +19,7 @@ namespace ForexExchange.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RealTimeCurrencyExchangeRates", x => x.RealTimeCurrencyExchangeRateId);
+                    table.PrimaryKey("PK_RealTimeCurrencyExchangeRates", x => x.ForexCurrencyModelId);
                 });
         }
 
