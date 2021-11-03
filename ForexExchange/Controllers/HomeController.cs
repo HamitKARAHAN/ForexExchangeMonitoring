@@ -24,18 +24,18 @@ namespace ForexExchange.Controllers
 
         public IActionResult Index()
         {
-            string[] currencies = { "USD", "TRY", "EUR", "GBP", "JPY", "CHF", "KWD", "RUB" };
-            for (int i = 0; i < currencies.Length; i++)
-            {
-                for (int j = 0; j < currencies.Length; j++)
-                {
-                    if (i.Equals(j))
-                        continue;               
-                    string QUERY_URL2 = "https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency="
-                            +  currencies[i] +  "&to_currency="+currencies[j] +"&apikey=1QHQEJN8ATXPVNI4";
+            //string[] currencies = { "USD", "TRY", "EUR", "GBP", "JPY", "CHF", "KWD", "RUB" };
+            //for (int i = 0; i < currencies.Length; i++)
+            //{
+            //    for (int j = 0; j < currencies.Length; j++)
+            //    {
+            //        if (i.Equals(j))
+            //            continue;               
+            //        string QUERY_URL2 = "https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency="
+            //                +  currencies[i] +  "&to_currency="+currencies[j] +"&apikey=1QHQEJN8ATXPVNI4";
                     
-                }
-            }
+            //    }
+            //}
             string QUERY_URL = "https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=JPY&apikey=1QHQEJN8ATXPVNI4";
             Uri queryUri = new Uri(QUERY_URL);
             using (WebClient client = new WebClient())
