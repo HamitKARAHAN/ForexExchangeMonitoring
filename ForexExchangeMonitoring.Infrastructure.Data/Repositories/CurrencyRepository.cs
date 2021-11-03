@@ -15,6 +15,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
         {
             _context = context;
         }
+
         public IEnumerable<ForexCurrencyModel> GetCurrencies()
         {
             return _context.RealTimeCurrencyExchangeRates;

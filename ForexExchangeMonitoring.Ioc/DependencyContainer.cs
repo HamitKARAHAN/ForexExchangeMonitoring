@@ -13,7 +13,6 @@ namespace ForexExchangeMonitoring.Ioc
         {
             services.AddScoped<ICurrencyService, CurrencyService>();
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
-            services.AddTransient<IWorkerService, WorkerService>();
         }
     }
 }
