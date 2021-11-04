@@ -1,5 +1,4 @@
-using ForexExchange.Worker.Interface;
-using ForexExchange.Worker.Servicce;
+
 using ForexExchangeMonitoring.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
