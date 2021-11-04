@@ -20,42 +20,27 @@ namespace ForexExchange.Controllers
             _currencyService = currencyService;
         }
 
-
-
         public IActionResult Index()
         {
-            //string[] currencies = { "USD", "TRY", "EUR", "GBP", "JPY", "CHF", "KWD", "RUB" };
-            //for (int i = 0; i < currencies.Length; i++)
+            //string QUERY_URL = "https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=JPY&apikey=1QHQEJN8ATXPVNI4";
+            //Uri queryUri = new Uri(QUERY_URL);
+            //using (WebClient client = new WebClient())
             //{
-            //    for (int j = 0; j < currencies.Length; j++)
+            //    dynamic json_data = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, dynamic>>(client.DownloadString(queryUri));
+            //    ForexCurrencyModel rt;
+            //    foreach (var item in json_data.Values)
             //    {
-            //        if (i.Equals(j))
-            //            continue;               
-            //        string QUERY_URL2 = "https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency="
-            //                +  currencies[i] +  "&to_currency="+currencies[j] +"&apikey=1QHQEJN8ATXPVNI4";
-                    
+            //        rt = new ForexCurrencyModel
+            //        {
+            //            FromCurrencyCode = item.GetProperty("1. From_Currency Code").ToString(),
+            //            ToCurrencyCode = item.GetProperty("3. To_Currency Code").ToString(),
+            //            ExchangeRate = item.GetProperty("5. Exchange Rate").ToString(),
+            //            LastRefreshedDate = Convert.ToDateTime(item.GetProperty("6. Last Refreshed").ToString())
+            //        };
+            //        _dbContext.RealTimeCurrencyExchangeRates.Add(rt);
+            //        _dbContext.SaveChanges();
             //    }
             //}
-            string QUERY_URL = "https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=JPY&apikey=1QHQEJN8ATXPVNI4";
-            Uri queryUri = new Uri(QUERY_URL);
-            using (WebClient client = new WebClient())
-            {
-                dynamic json_data = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, dynamic>>(client.DownloadString(queryUri));
-                ForexCurrencyModel deserializedProduct = JsonConvert.DeserializeObject<ForexCurrencyModel>(client.DownloadString(queryUri));
-                ForexCurrencyModel rt;
-                foreach (var item in json_data.Values)
-                {
-                    rt = new ForexCurrencyModel
-                    {
-                        FromCurrencyCode = item.GetProperty("1. From_Currency Code").ToString(),
-                        ToCurrencyCode = item.GetProperty("3. To_Currency Code").ToString(),
-                        ExchangeRate = item.GetProperty("5. Exchange Rate").ToString(),
-                        LastRefreshedDate = Convert.ToDateTime(item.GetProperty("6. Last Refreshed").ToString())
-                    };
-                    _dbContext.RealTimeCurrencyExchangeRates.Add(rt);
-                    _dbContext.SaveChanges();
-                }
-            }
             return View();
         }
 

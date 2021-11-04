@@ -11,9 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForexExchangeMonitoring.Inf
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForexExchangeMonitoring.Application", "ForexExchangeMonitoring.Application\ForexExchangeMonitoring.Application.csproj", "{381FB877-3293-44C8-80D0-2151875FEB64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForexExchangeMonitoring.Ioc", "ForexExchangeMonitoring.Ioc\ForexExchangeMonitoring.Ioc.csproj", "{F2BB468A-3EF7-480D-BFCA-6C038CD26DCA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForexExchange.Worker", "ForexExchange.Worker\ForexExchange.Worker.csproj", "{BFFE2242-8E55-43A6-8E07-79FE14316A8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForexExchange.Worker", "ForexExchange.Worker\ForexExchange.Worker.csproj", "{BFFE2242-8E55-43A6-8E07-79FE14316A8A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +35,6 @@ Global
 		{381FB877-3293-44C8-80D0-2151875FEB64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{381FB877-3293-44C8-80D0-2151875FEB64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{381FB877-3293-44C8-80D0-2151875FEB64}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F2BB468A-3EF7-480D-BFCA-6C038CD26DCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F2BB468A-3EF7-480D-BFCA-6C038CD26DCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F2BB468A-3EF7-480D-BFCA-6C038CD26DCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F2BB468A-3EF7-480D-BFCA-6C038CD26DCA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BFFE2242-8E55-43A6-8E07-79FE14316A8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BFFE2242-8E55-43A6-8E07-79FE14316A8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFFE2242-8E55-43A6-8E07-79FE14316A8A}.Release|Any CPU.ActiveCfg = Release|Any CPU

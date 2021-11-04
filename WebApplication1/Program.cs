@@ -1,16 +1,13 @@
-using ForexExchange.Worker.Interface;
-using ForexExchange.Worker.Servicce;
-using ForexExchangeMonitoring.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ForexExchange.Worker
+namespace WebApplication1
 {
     public class Program
     {
@@ -18,11 +15,12 @@ namespace ForexExchange.Worker
         {
             CreateHostBuilder(args).Build().Run();
         }
+
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureServices((hostContext, services) =>
+                .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    services.AddHostedService<Worker>();
+                    webBuilder.UseStartup<Startup>();
                 });
     }
 }

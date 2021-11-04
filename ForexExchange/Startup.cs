@@ -1,5 +1,8 @@
+using ForexExchangeMonitoring.Application.Interfaces;
+using ForexExchangeMonitoring.Application.Services;
+using ForexExchangeMonitoring.Domain.Interfaces;
 using ForexExchangeMonitoring.Infrastructure.Data;
-using ForexExchangeMonitoring.Ioc;
+using ForexExchangeMonitoring.Infrastructure.Data.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -32,13 +35,9 @@ namespace ForexExchange
                 options.UseSqlServer(
                 Configuration.GetConnectionString("myconn"));
             });
-            RegisterServices(services);
-        }
+            services.AddScoped<ICurrencyService, CurrencyService>();
+            services.AddScoped<ICurrencyRepository, CurrencyRepository>();
 
-
-        private static void RegisterServices(IServiceCollection services)
-        {
-            DependencyContainer.RegisterServices(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
