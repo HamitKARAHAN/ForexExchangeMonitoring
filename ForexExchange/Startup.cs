@@ -2,6 +2,7 @@ using ForexExchangeMonitoring.Application.Interfaces;
 using ForexExchangeMonitoring.Application.Services;
 using ForexExchangeMonitoring.Domain.Interfaces;
 using ForexExchangeMonitoring.Infrastructure.Data;
+using ForexExchangeMonitoring.Infrastructure.Data.Context;
 using ForexExchangeMonitoring.Infrastructure.Data.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -43,9 +44,11 @@ namespace ForexExchange
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+               
             }
             else
             {
