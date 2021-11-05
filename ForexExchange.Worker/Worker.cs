@@ -20,26 +20,25 @@ namespace ForexExchange.Worker
 {
     public class Worker : BackgroundService
     {
-        public Worker(IConfiguration configuration, ILogger<Worker> logger, ForexCurrencyModelDbContext dbContextt)
+        public Worker(ILogger<Worker> logger, IServiceProvider serviceProvider)
         {
-            Configuration = configuration;
+     
             _logger = logger;
-            _dbContextt = dbContextt;
+            _serviceProvider = serviceProvider;
 
         }
         private readonly ILogger<Worker> _logger;
-        public IConfiguration Configuration { get; }
+        public IServiceProvider _serviceProvider;
 
-        ForexCurrencyModelDbContext _dbContextt;/* = new ForexCurrencyModelDbContext();*/
-        public Dictionary<string, string> ApiKeys { get; set; }
 
-        private string ConfigureApiKeys(int i)
-        {
 
-            string currentApiKey = Configuration.GetValue<string>("ApiKeys:ApiKey"+i);
+        //private string ConfigureApiKeys(int i)
+        //{
 
-            return currentApiKey;
-        }
+        //    string currentApiKey = Configuration.GetValue<string>("ApiKeys:ApiKey"+i);
+
+        //    return currentApiKey;
+        //}
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -51,12 +50,14 @@ namespace ForexExchange.Worker
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                 try
                 {
-                    var task1 = Get(currencies);
-                    var task2 = Task.Delay(1000, stoppingToken);
-                    await task1;
-                    await task2;
 
+                    using (IServiceScope scope = _serviceProvider.CreateScope())
+                    {
+                        var context = scope.ServiceProvider.GetRequiredService<ForexCurrencyModelDbContext>();
+                        await Get(context, currencies);
+                    }
                     await Task.Delay(1000, stoppingToken);
+
                 }
                 catch (Exception)
                 {
@@ -67,13 +68,13 @@ namespace ForexExchange.Worker
             }
         }
 
-        private async Task Get(string[] currencies)
+        private async Task Get(ForexCurrencyModelDbContext _dbContextt, string[] currencies)
         {
             for (int i = 0; i < currencies.Length; i++)
             {
                 int keyCounter = 0;
-                string apiKey = ConfigureApiKeys(i);
-                
+                //string apiKey = ConfigureApiKeys(i);
+
                 for (int j = 0; j < currencies.Length; j++)
                 {
                     if (i.Equals(j))
@@ -90,20 +91,17 @@ namespace ForexExchange.Worker
                         var response = await _client.GetAsync(QUERY_URL);
 
                         string responseBody = await response.Content.ReadAsStringAsync();
-                        //if(!responseBody.StartsWith('{'))
-                        //{
-                        //    string apiKey = ConfigureApiKeys(i);
-                        //}
                         Dictionary<string, ForexCurrencyModel> json_data = JsonConvert.DeserializeObject<Dictionary<string, ForexCurrencyModel>>(responseBody);
                         foreach (var item in json_data.Values)
                         {
-                            //_dbContextt.
                             _dbContextt.RealTimeCurrencyExchangeRates.Add(item);
                         }
                         _dbContextt.SaveChanges();
                     }
                 }
             }
+
+
         }
     }
 }

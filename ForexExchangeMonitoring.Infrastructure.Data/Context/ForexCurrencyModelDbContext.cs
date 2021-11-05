@@ -8,7 +8,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data
 {
     public class ForexCurrencyModelDbContext : DbContext
     {
-        public ForexCurrencyModelDbContext(DbContextOptions options) : base(options)
+        public ForexCurrencyModelDbContext(DbContextOptions<ForexCurrencyModelDbContext> options) : base(options)
         {
         }
         public ForexCurrencyModelDbContext() : base()
@@ -28,5 +28,6 @@ namespace ForexExchangeMonitoring.Infrastructure.Data
             }
         }
         public DbSet<ForexCurrencyModel> RealTimeCurrencyExchangeRates { get; set; }
+        public DbSet<CurrencyModel> Currencies { get; set; }
     }
 }
