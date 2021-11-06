@@ -23,7 +23,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Context
             {
                 var currencies = new CurrencyModel[]
                 {
-                   new CurrencyModel{CurrencyName="USD"},
+                   new CurrencyModel{CurrencyName ="USD"},
                    new CurrencyModel{CurrencyName ="TRY"},
                    new CurrencyModel{CurrencyName ="EUR"},
                    new CurrencyModel{CurrencyName ="GBP"},
@@ -42,6 +42,6 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Context
 
 
         }
-           
+
     }
 }

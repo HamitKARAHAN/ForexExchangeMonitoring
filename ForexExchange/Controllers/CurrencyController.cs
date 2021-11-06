@@ -21,7 +21,7 @@ namespace ForexExchange.Controllers
             return View(_currencyService.GetCurrencies());
         }
         // GET: ProjectController/Details/5
-        public ActionResult Details(int id)
+        public ActionResult History(int id)
         {
             return View();
         }

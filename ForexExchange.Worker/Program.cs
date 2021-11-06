@@ -31,8 +31,8 @@ namespace ForexExchange.Worker
                 {    
                     services.AddHostedService<Worker>();
                     services.AddDbContext<ForexCurrencyModelDbContext>(options =>
-                        options.UseSqlServer("Server=localhost;Database=ForexEchangeMonitoring;Trusted_Connection=True;MultipleActiveResultSets=true"));
-                    
+                        options.UseSqlServer("Server=localhost\\MSSQLSERVER02;Database=ForexExchangeMonitoring;Trusted_Connection=True;MultipleActiveResultSets=true"));
+
                 });
     }
 }

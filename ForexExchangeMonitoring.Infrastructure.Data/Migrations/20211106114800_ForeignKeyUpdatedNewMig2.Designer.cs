@@ -4,14 +4,16 @@ using ForexExchangeMonitoring.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ForexCurrencyModelDbContext))]
-    partial class ForexCurrencyModelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211106114800_ForeignKeyUpdatedNewMig2")]
+    partial class ForeignKeyUpdatedNewMig2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,7 +43,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("CurrencyModelId")
+                    b.Property<int>("CurrencyModelId")
                         .HasColumnType("int");
 
                     b.Property<string>("ExchangeRate")
@@ -58,18 +60,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
 
                     b.HasKey("ForexCurrencyModelId");
 
-                    b.HasIndex("CurrencyModelId");
-
                     b.ToTable("RealTimeCurrencyExchangeRates");
-                });
-
-            modelBuilder.Entity("ForexExchangeMonitoring.Domain.Models.ForexCurrencyModel", b =>
-                {
-                    b.HasOne("ForexExchangeMonitoring.Domain.Models.CurrencyModel", "currencyModelId")
-                        .WithMany()
-                        .HasForeignKey("CurrencyModelId");
-
-                    b.Navigation("currencyModelId");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ForexExchangeMonitoring.Domain.Models
 {
@@ -18,6 +19,9 @@ namespace ForexExchangeMonitoring.Domain.Models
 
         [JsonProperty("6. Last Refreshed")]
         public DateTime LastRefreshedDate { get; set; }
+
+        [ForeignKey("CurrencyModelId")]
+        public CurrencyModel currencyModelId { get; set; }
 
     }
 }

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ForexCurrencyModelDbContext))]
-    [Migration("20211103045052_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20211106114429_ForeignKeyUpdatedNewMig")]
+    partial class ForeignKeyUpdatedNewMig
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,21 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.11")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("ForexExchangeMonitoring.Domain.Models.CurrencyModel", b =>
+                {
+                    b.Property<int>("CurrencyModelId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CurrencyName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CurrencyModelId");
+
+                    b.ToTable("Currencies");
+                });
 
             modelBuilder.Entity("ForexExchangeMonitoring.Domain.Models.ForexCurrencyModel", b =>
                 {
@@ -39,6 +54,9 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
 
                     b.Property<string>("ToCurrencyCode")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("currencyModelId")
+                        .HasColumnType("int");
 
                     b.HasKey("ForexCurrencyModelId");
 

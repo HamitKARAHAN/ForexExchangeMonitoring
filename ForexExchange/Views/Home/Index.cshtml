@@ -1,9 +1,32 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
-
-<div class="text-center">
-    
+﻿@model ForexExchangeMonitoring.Application.ViewModels.ForexCurrencyViewModel
 
 
-</div>
+<table id="currency" class="table table-bordered table-hover">
+    <thead>
+        <tr class="">
+            <th>Currency</th>
+            <th>Rate</th>
+            <th>Last Modified Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Currencies)
+        {
+            <tr style="height:60px;">
+                <td>
+                    @Html.ActionLink(item.FromCurrencyCode + "/" + item.ToCurrencyCode,
+                                     "History", "Home",
+                                     new { _currencyModelId = item.currencyModelId.CurrencyModelId })
+                </td>
+                <td>@Html.DisplayFor(modelItem => item.ExchangeRate)</td>
+                <td>@Html.DisplayFor(modelItem => item.LastRefreshedDate)</td>
+            </tr>
+        }
+
+    </tbody>
+
+
+
+</table>
+
+

@@ -10,6 +10,6 @@ namespace ForexExchangeMonitoring.Domain.Interfaces
     public interface ICurrencyRepository
     {
         IEnumerable<ForexCurrencyModel> GetCurrencies();
-        void WriteToDb(ForexCurrencyModel model);
+        //void WriteToDb(ForexCurrencyModel model);
     }
 }
