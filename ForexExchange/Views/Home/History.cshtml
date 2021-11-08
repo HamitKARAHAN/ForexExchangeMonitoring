@@ -1,5 +1,31 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model ForexExchangeMonitoring.Application.ViewModels.ForexCurrencyViewModel
+
+@{ string x = "s";}
+<table id="currency" class="table table-bordered table-hover">
+    <thead>
+        <tr class="">
+            <th>Currency</th>
+            <th>Rate</th>
+            <th>Last Modified Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ForexCurrencies)
+        {
+            <tr style="height:60px;">
+                <td>@item.FromCurrencyCode/@item.ToCurrencyCode</td>
+                @*<td>
+                    @Html.ActionLink(item.FromCurrencyCode + "/" + item.ToCurrencyCode,
+                                     "History", "Home",
+                                     new { _currencyModelId = item.ForexCurrencyModelId.CurrencyModelId })
+                </td>*@
+                <td>@item.ExchangeRate</td>
+                <td>@item.LastRefreshedDate.ToString().Substring(0, 15)</td>
+            </tr>
+        }
+
+    </tbody>
+
+
+
+</table>

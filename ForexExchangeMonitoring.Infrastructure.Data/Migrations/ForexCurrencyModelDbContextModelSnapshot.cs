@@ -41,35 +41,40 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("CurrencyModelId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ExchangeRate")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FromCurrencyCode")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("FromCurrencyCodeCurrencyModelId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("LastRefreshedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ToCurrencyCode")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("ToCurrencyCodeCurrencyModelId")
+                        .HasColumnType("int");
 
                     b.HasKey("ForexCurrencyModelId");
 
-                    b.HasIndex("CurrencyModelId");
+                    b.HasIndex("FromCurrencyCodeCurrencyModelId");
+
+                    b.HasIndex("ToCurrencyCodeCurrencyModelId");
 
                     b.ToTable("RealTimeCurrencyExchangeRates");
                 });
 
             modelBuilder.Entity("ForexExchangeMonitoring.Domain.Models.ForexCurrencyModel", b =>
                 {
-                    b.HasOne("ForexExchangeMonitoring.Domain.Models.CurrencyModel", "currencyModelId")
+                    b.HasOne("ForexExchangeMonitoring.Domain.Models.CurrencyModel", "FromCurrencyCode")
                         .WithMany()
-                        .HasForeignKey("CurrencyModelId");
+                        .HasForeignKey("FromCurrencyCodeCurrencyModelId");
 
-                    b.Navigation("currencyModelId");
+                    b.HasOne("ForexExchangeMonitoring.Domain.Models.CurrencyModel", "ToCurrencyCode")
+                        .WithMany()
+                        .HasForeignKey("ToCurrencyCodeCurrencyModelId");
+
+                    b.Navigation("FromCurrencyCode");
+
+                    b.Navigation("ToCurrencyCode");
                 });
 #pragma warning restore 612, 618
         }

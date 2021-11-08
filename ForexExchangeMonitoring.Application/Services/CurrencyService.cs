@@ -17,14 +17,20 @@ namespace ForexExchangeMonitoring.Application.Services
             _currencyRepository = currencyRepository;
         }
 
-        public ForexCurrencyViewModel GetCurrencies()
+        public ForexCurrencyViewModel GetCurrencies(DateTime now)
         {
             return new ForexCurrencyViewModel()
             {
-                Currencies = _currencyRepository.GetCurrencies()
+                ForexCurrencies = _currencyRepository.GetCurrencies(now)
             };
         }
-
+        ForexCurrencyViewModel ICurrencyService.getCurrencyRate(int fromCurrencyModelId, int toCurrencyModelId)
+        {
+            return new ForexCurrencyViewModel()
+            {
+                ForexCurrencies = _currencyRepository.getCurrencyRate(fromCurrencyModelId, toCurrencyModelId)
+            };
+        }
     }
 }
 

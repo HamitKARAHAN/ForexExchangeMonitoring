@@ -20,14 +20,13 @@ namespace ForexExchange.Controllers
 
         public ActionResult Index()
         {
-            return View(_currencyService.GetCurrencies());
+            DateTime now = DateTime.Now;
+            return View(_currencyService.GetCurrencies(now));
         }
-        // GET: ProjectController/History/5
-        public ActionResult History(int _currencyModelId)
+        // GET: HomeController/History/id
+        public ActionResult History(int fromCurrencyModelId, int toCurrencyModelId)
         {
-            return View();
+            return View(_currencyService.getCurrencyRate(fromCurrencyModelId, toCurrencyModelId));
         }
-
-        
     }
 }

@@ -14,7 +14,6 @@ namespace ForexExchangeMonitoring.Infrastructure.Data
         public ForexCurrencyModelDbContext() : base()
         {
         }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
