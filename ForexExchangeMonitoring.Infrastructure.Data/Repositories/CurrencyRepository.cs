@@ -19,13 +19,12 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
 
         public IEnumerable<ForexCurrencyModel> GetCurrencies(DateTime now)
         {
-            //Include fonksiyonunda eager loadaing yapamadığım için history basarken hata yaşıyorum
             if (now.Hour > 20)
             {
                 DateTime queryDate = new DateTime(now.Year, now.Month, now.Day, 18, 0, 0);
                 return _context.RealTimeCurrencyExchangeRates
                                                             .Where(c => c.LastRefreshedDate.CompareTo(queryDate) > 0)
-                                                            /*.Include(c => c.FromCurrencyCode.CurrencyModelId)*/;
+                                                           .Include(c => c.FromCurrencyCode).Include(c => c.ToCurrencyCode);
             }
             else if (now.Hour < 11)
             {
@@ -33,32 +32,34 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
 
                 return _context.RealTimeCurrencyExchangeRates
                                                             .Where(c => c.LastRefreshedDate.CompareTo(queryDate) > 0)
-                                                            /*.Include(c => c.FromCurrencyCode.CurrencyModelId)*/;
+                                                           .Include(c => c.FromCurrencyCode).Include(c => c.ToCurrencyCode);
             }
             else if (now.Minute > 30)
             {
                 DateTime queryDate = new DateTime(now.Year, now.Month, now.Day, now.Hour - 3, 30, 0);
                 return _context.RealTimeCurrencyExchangeRates
                                                             .Where(c => c.LastRefreshedDate.CompareTo(queryDate) > 0)
-                                                            /*.Include(c => c.FromCurrencyCode.CurrencyModelId)*/;
+                                                           .Include(c => c.FromCurrencyCode).Include(c => c.ToCurrencyCode);
             }
             else
             {
 
                 DateTime queryDate = new DateTime(now.Year, now.Month, now.Day, now.Hour - 3, 0, 0);
+                var x = _context.RealTimeCurrencyExchangeRates
+                                            .Where(c => c.LastRefreshedDate.CompareTo(queryDate) > 0)
+                                            .Include(c => c.FromCurrencyCode).Include(c=>c.ToCurrencyCode);
                 return _context.RealTimeCurrencyExchangeRates
                                                             .Where(c => c.LastRefreshedDate.CompareTo(queryDate) > 0)
-                                                            /*.Include(c => c.FromCurrencyCode.CurrencyModelId)*/;
+                                                            .Include(c => c.FromCurrencyCode).Include(c => c.ToCurrencyCode);
             }
             throw new NotImplementedException();
         }
 
         public IEnumerable<ForexCurrencyModel> getCurrencyRate(int FromcurrencyModelId,int toCurrencyModelId)
         {
-            //var x = _context.RealTimeCurrencyExchangeRates.Where(c => (c.FromCurrencyCode.CurrencyModelId == FromcurrencyModelId) && (c.ToCurrencyCode.CurrencyModelId== toCurrencyModelId)).Include(c => c.FromCurrencyCode.CurrencyModelId);
             return _context.RealTimeCurrencyExchangeRates.
                                         Where(c => (c.FromCurrencyCode.CurrencyModelId == FromcurrencyModelId) && (c.ToCurrencyCode.CurrencyModelId == toCurrencyModelId))
-                                       /* .Include(c => c.FromCurrencyCode.CurrencyModelId)*/;
+                                        .Include(c => c.FromCurrencyCode).Include(c => c.ToCurrencyCode);
         }
     }
 }

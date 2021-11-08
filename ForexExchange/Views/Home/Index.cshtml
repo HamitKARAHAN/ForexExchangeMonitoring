@@ -1,6 +1,5 @@
 ﻿@model ForexExchangeMonitoring.Application.ViewModels.ForexCurrencyViewModel
 
-@{ string x = "s";}
 <table id="currency" class="table table-bordered table-hover">
     <thead>
         <tr class="">
@@ -13,9 +12,8 @@
         @foreach (var item in Model.ForexCurrencies)
         {
             <tr style="height:60px;">
-                @*<td>@item.FromCurrencyCode.CurrencyModelId/@item.ToCurrencyCode.CurrencyModelId</td>*@
                 <td>
-                    @Html.ActionLink(item._FromCurrencyCode + "/" + item._ToCurrencyCode,
+                    @Html.ActionLink(item.FromCurrencyCode.CurrencyName + "/" + item.ToCurrencyCode.CurrencyName,
                                      "History", "Home",
                                    new { fromCurrencyModelId = item.FromCurrencyCode.CurrencyModelId, toCurrencyModelId = item.ToCurrencyCode.CurrencyModelId })
                 </td>
@@ -23,11 +21,7 @@
                 <td>@item.LastRefreshedDate.ToString().Substring(0, 15)</td>
             </tr>
         }
-
     </tbody>
-
-
-
 </table>
 
 
