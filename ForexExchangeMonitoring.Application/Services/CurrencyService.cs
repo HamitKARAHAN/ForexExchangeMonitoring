@@ -11,7 +11,7 @@ namespace ForexExchangeMonitoring.Application.Services
 {
     public class CurrencyService : ICurrencyService
     {
-        public ICurrencyRepository _currencyRepository;
+        private readonly ICurrencyRepository _currencyRepository;
         public CurrencyService(ICurrencyRepository currencyRepository)
         {
             _currencyRepository = currencyRepository;
@@ -24,11 +24,11 @@ namespace ForexExchangeMonitoring.Application.Services
                 ForexCurrencies = _currencyRepository.GetCurrencies(now)
             };
         }
-        ForexCurrencyViewModel ICurrencyService.getCurrencyRate(int fromCurrencyModelId, int toCurrencyModelId)
+        ForexCurrencyViewModel ICurrencyService.GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId)
         {
             return new ForexCurrencyViewModel()
             {
-                ForexCurrencies = _currencyRepository.getCurrencyRate(fromCurrencyModelId, toCurrencyModelId)
+                ForexCurrencies = _currencyRepository.GetCurrencyHistory(fromCurrencyModelId, toCurrencyModelId)
             };
         }
     }

@@ -10,7 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ForexExchangeMonitoring.Application\ForexExchangeMonitoring.Application.csproj" />
     <ProjectReference Include="..\ForexExchangeMonitoring.Infrastructure.Data\ForexExchangeMonitoring.Infrastructure.Data.csproj" />
   </ItemGroup>
 </Project>

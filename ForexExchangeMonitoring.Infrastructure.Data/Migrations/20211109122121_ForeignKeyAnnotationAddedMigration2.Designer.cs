@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ForexCurrencyModelDbContext))]
-    [Migration("20211108060647_ForeignKeysChangedMigration")]
-    partial class ForeignKeysChangedMigration
+    [Migration("20211109122121_ForeignKeyAnnotationAddedMigration2")]
+    partial class ForeignKeyAnnotationAddedMigration2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,10 +26,12 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
                     b.Property<int>("CurrencyModelId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasColumnName("currency_Id")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CurrencyName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("currency_name");
 
                     b.HasKey("CurrencyModelId");
 
@@ -41,42 +43,58 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
                     b.Property<int>("ForexCurrencyModelId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasColumnName("forex_currency_model_id")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ExchangeRate")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("exchange_rate");
 
-                    b.Property<int?>("FromCurrencyCodeCurrencyModelId")
-                        .HasColumnType("int");
+                    b.Property<int>("FromCurrencyId")
+                        .HasColumnType("int")
+                        .HasColumnName("from_currency_id");
 
                     b.Property<DateTime>("LastRefreshedDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("last_refreshed_date");
 
-                    b.Property<int?>("ToCurrencyCodeCurrencyModelId")
-                        .HasColumnType("int");
+                    b.Property<int>("ToCurrencyId")
+                        .HasColumnType("int")
+                        .HasColumnName("to_currency_id");
 
                     b.HasKey("ForexCurrencyModelId");
 
-                    b.HasIndex("FromCurrencyCodeCurrencyModelId");
+                    b.HasIndex("FromCurrencyId");
 
-                    b.HasIndex("ToCurrencyCodeCurrencyModelId");
+                    b.HasIndex("ToCurrencyId");
 
                     b.ToTable("RealTimeCurrencyExchangeRates");
                 });
 
             modelBuilder.Entity("ForexExchangeMonitoring.Domain.Models.ForexCurrencyModel", b =>
                 {
-                    b.HasOne("ForexExchangeMonitoring.Domain.Models.CurrencyModel", "FromCurrencyCode")
-                        .WithMany()
-                        .HasForeignKey("FromCurrencyCodeCurrencyModelId");
+                    b.HasOne("ForexExchangeMonitoring.Domain.Models.CurrencyModel", "FromCurrency")
+                        .WithMany("FromCurrencyIds")
+                        .HasForeignKey("FromCurrencyId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
 
-                    b.HasOne("ForexExchangeMonitoring.Domain.Models.CurrencyModel", "ToCurrencyCode")
-                        .WithMany()
-                        .HasForeignKey("ToCurrencyCodeCurrencyModelId");
+                    b.HasOne("ForexExchangeMonitoring.Domain.Models.CurrencyModel", "ToCurrency")
+                        .WithMany("ToCurrencyIds")
+                        .HasForeignKey("ToCurrencyId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
 
-                    b.Navigation("FromCurrencyCode");
+                    b.Navigation("FromCurrency");
 
-                    b.Navigation("ToCurrencyCode");
+                    b.Navigation("ToCurrency");
+                });
+
+            modelBuilder.Entity("ForexExchangeMonitoring.Domain.Models.CurrencyModel", b =>
+                {
+                    b.Navigation("FromCurrencyIds");
+
+                    b.Navigation("ToCurrencyIds");
                 });
 #pragma warning restore 612, 618
         }

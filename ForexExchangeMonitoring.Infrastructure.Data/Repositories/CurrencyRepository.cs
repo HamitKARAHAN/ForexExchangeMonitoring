@@ -4,14 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
 {
     public class CurrencyRepository : ICurrencyRepository
     {
-        public ForexCurrencyModelDbContext _context;
+        private readonly ForexCurrencyModelDbContext _context;
         public CurrencyRepository(ForexCurrencyModelDbContext context)
         {
             _context = context;
@@ -19,12 +17,17 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
 
         public IEnumerable<ForexCurrencyModel> GetCurrencies(DateTime now)
         {
+
+
+
+
+
             if (now.Hour > 20)
             {
                 DateTime queryDate = new DateTime(now.Year, now.Month, now.Day, 18, 0, 0);
                 return _context.RealTimeCurrencyExchangeRates
                                                             .Where(c => c.LastRefreshedDate.CompareTo(queryDate) > 0)
-                                                           .Include(c => c.FromCurrencyCode).Include(c => c.ToCurrencyCode);
+                                                           .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
             }
             else if (now.Hour < 11)
             {
@@ -32,34 +35,30 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
 
                 return _context.RealTimeCurrencyExchangeRates
                                                             .Where(c => c.LastRefreshedDate.CompareTo(queryDate) > 0)
-                                                           .Include(c => c.FromCurrencyCode).Include(c => c.ToCurrencyCode);
+                                                           .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
             }
             else if (now.Minute > 30)
             {
                 DateTime queryDate = new DateTime(now.Year, now.Month, now.Day, now.Hour - 3, 30, 0);
                 return _context.RealTimeCurrencyExchangeRates
                                                             .Where(c => c.LastRefreshedDate.CompareTo(queryDate) > 0)
-                                                           .Include(c => c.FromCurrencyCode).Include(c => c.ToCurrencyCode);
+                                                           .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
             }
             else
             {
-
                 DateTime queryDate = new DateTime(now.Year, now.Month, now.Day, now.Hour - 3, 0, 0);
-                var x = _context.RealTimeCurrencyExchangeRates
-                                            .Where(c => c.LastRefreshedDate.CompareTo(queryDate) > 0)
-                                            .Include(c => c.FromCurrencyCode).Include(c=>c.ToCurrencyCode);
                 return _context.RealTimeCurrencyExchangeRates
                                                             .Where(c => c.LastRefreshedDate.CompareTo(queryDate) > 0)
-                                                            .Include(c => c.FromCurrencyCode).Include(c => c.ToCurrencyCode);
+                                                            .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
             }
-            throw new NotImplementedException();
         }
 
-        public IEnumerable<ForexCurrencyModel> getCurrencyRate(int FromcurrencyModelId,int toCurrencyModelId)
+        public IEnumerable<ForexCurrencyModel> GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId)
         {
             return _context.RealTimeCurrencyExchangeRates.
-                                        Where(c => (c.FromCurrencyCode.CurrencyModelId == FromcurrencyModelId) && (c.ToCurrencyCode.CurrencyModelId == toCurrencyModelId))
-                                        .Include(c => c.FromCurrencyCode).Include(c => c.ToCurrencyCode);
+                                        Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId) && (c.ToCurrency.CurrencyModelId == toCurrencyModelId))
+                                        .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
+
         }
     }
 }

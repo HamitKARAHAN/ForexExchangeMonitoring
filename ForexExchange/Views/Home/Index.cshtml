@@ -13,9 +13,9 @@
         {
             <tr style="height:60px;">
                 <td>
-                    @Html.ActionLink(item.FromCurrencyCode.CurrencyName + "/" + item.ToCurrencyCode.CurrencyName,
+                    @Html.ActionLink(item.FromCurrency.CurrencyName + "/" + item.ToCurrency.CurrencyName,
                                      "History", "Home",
-                                   new { fromCurrencyModelId = item.FromCurrencyCode.CurrencyModelId, toCurrencyModelId = item.ToCurrencyCode.CurrencyModelId })
+                                   new { fromCurrencyModelId = item.FromCurrency.CurrencyModelId, toCurrencyModelId = item.ToCurrency.CurrencyModelId })
                 </td>
                 <td>@item.ExchangeRate</td>
                 <td>@item.LastRefreshedDate.ToString().Substring(0, 15)</td>
