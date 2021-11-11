@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ForexExchangeMonitoring.Domain.Models
+namespace ForexExchangeMonitoring.Domain.DbModels
 {
     public class CurrencyModel
     {
@@ -15,9 +15,9 @@ namespace ForexExchangeMonitoring.Domain.Models
         public int CurrencyModelId { get; set; }
 
         [Column("currency_name")]
-        public string CurrencyName{ get; set; }
+        public string CurrencyName { get; set; }
 
-        public List<ForexCurrencyModel> FromCurrencyIds{ get; set; }
-        public List<ForexCurrencyModel> ToCurrencyIds { get; set; }
+        public virtual List<ForexCurrencyModel> FromCurrencyIds { get; set; }
+        public virtual List<ForexCurrencyModel> ToCurrencyIds { get; set; }
     }
 }

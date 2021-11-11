@@ -1,4 +1,4 @@
-﻿using ForexExchangeMonitoring.Domain.Models;
+﻿using ForexExchangeMonitoring.Domain.DbModels;
 using System.Collections.Generic;
 
 namespace ForexExchangeMonitoring.Application.ViewModels

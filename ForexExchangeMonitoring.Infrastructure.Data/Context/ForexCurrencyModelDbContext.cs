@@ -1,5 +1,5 @@
 ﻿using System;
-using ForexExchangeMonitoring.Domain.Models;
+using ForexExchangeMonitoring.Domain.DbModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace ForexExchangeMonitoring.Infrastructure.Data
@@ -20,10 +20,10 @@ namespace ForexExchangeMonitoring.Infrastructure.Data
 
 
 
-            modelBuilder.Entity<ForexCurrencyModel>().HasOne<CurrencyModel>(s => s.FromCurrency).WithMany(g => g.FromCurrencyIds)
+            modelBuilder.Entity<CurrencyModel>().HasMany<ForexCurrencyModel>(s => s.FromCurrencyIds).WithOne(g => g.FromCurrency)
                 .HasForeignKey(s => s.FromCurrencyId).OnDelete(DeleteBehavior.ClientCascade); 
 
-            modelBuilder.Entity<ForexCurrencyModel>().HasOne<CurrencyModel>(s => s.ToCurrency).WithMany(g => g.ToCurrencyIds)
+            modelBuilder.Entity<CurrencyModel>().HasMany<ForexCurrencyModel>(s => s.ToCurrencyIds).WithOne(g => g.ToCurrency)
                 .HasForeignKey(s => s.ToCurrencyId).OnDelete(DeleteBehavior.ClientCascade); 
         }
 

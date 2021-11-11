@@ -1,12 +1,7 @@
 ﻿using ForexExchangeMonitoring.Application.Interfaces;
-using ForexExchangeMonitoring.Domain.Models;
-using ForexExchangeMonitoring.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 using System;
-using System.Collections.Generic;
-using System.Net;
-using Newtonsoft.Json;
+
 namespace ForexExchange.Controllers
 {
     public class HomeController : Controller

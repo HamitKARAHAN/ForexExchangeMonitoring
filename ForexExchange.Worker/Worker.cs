@@ -1,4 +1,4 @@
-using ForexExchangeMonitoring.Domain.Models;
+using ForexExchangeMonitoring.Domain.DbModels;
 using ForexExchangeMonitoring.Infrastructure.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Linq;
+using Newtonsoft.Json.Converters;
+using ForexExchangeMonitoring.Domain.JsonModels;
 
 namespace ForexExchange.Worker
 {
@@ -25,12 +27,6 @@ namespace ForexExchange.Worker
             _logger = logger;
             _serviceProvider = serviceProvider;
             _configuration = configuration;
-        }
-
-        private string ConfigureApiKeys(int i)
-        {
-            string currentApiKey = _configuration.GetValue<string>("ApiKeys:ApiKey" + i);
-            return currentApiKey;
         }
 
         private async Task TimeDelay()
@@ -52,7 +48,6 @@ namespace ForexExchange.Worker
 
         protected async override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            string[] currencies = { "USD", "TRY", "EUR", "GBP", "JPY", "CHF", "KWD", "RUB" };
             while (!stoppingToken.IsCancellationRequested)
             {
                 await TimeDelay();
@@ -62,7 +57,7 @@ namespace ForexExchange.Worker
                     using (IServiceScope scope = _serviceProvider.CreateScope())
                     {
                         var context = scope.ServiceProvider.GetRequiredService<ForexCurrencyModelDbContext>();
-                        await WriteToDb(context, currencies);
+                        await WriteToDb(context);
                     }
                     await Task.Delay(1800000, stoppingToken);
                 }
@@ -74,34 +69,28 @@ namespace ForexExchange.Worker
             }
         }
 
-        private async Task WriteToDb(ForexCurrencyModelDbContext _dbContextt, string[] currencies)
+        private async Task WriteToDb(ForexCurrencyModelDbContext _dbContextt)
         {
-            var currenciesFromDb = _dbContextt.Currencies.ToList();
-            for (int i = 0; i < currencies.Length; i++)
+            string QUERY_URL = _configuration.GetConnectionString("QUERY_URL");
+            using (var _client = new HttpClient())
             {
-                for (int j = 0; j < currencies.Length; j++)
+                var response = await _client.GetAsync(QUERY_URL);
+                string responseBody = await response.Content.ReadAsStringAsync();
+                Root jobject = JsonConvert.DeserializeObject<Root>(responseBody);
+
+                var currenciesFromDb = _dbContextt.Currencies.ToList();
+                foreach (var item in jobject.Quotes)
                 {
-                    if (i.Equals(j))
-                        continue;
-                    string currenctApiKey = ConfigureApiKeys(j);
-                    string QUERY_URL = "https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency="
-                            + currencies[i] + "&to_currency=" + currencies[j] + "&apikey=" + currenctApiKey;
-                    using (var _client = new HttpClient())
+                    ForexCurrencyModel model = new()
                     {
-                        var response = await _client.GetAsync(QUERY_URL);
-                        string responseBody = await response.Content.ReadAsStringAsync();
-                        Dictionary<string, ForexCurrencyModel> json_data = JsonConvert.DeserializeObject<Dictionary<string, ForexCurrencyModel>>(responseBody);
-
-                        foreach (var item in json_data.Values)
-                        {
-                            item.FromCurrencyId = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.FromCurrencyCode).CurrencyModelId;
-                            item.ToCurrencyId = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.ToCurrencyCode).CurrencyModelId;
-
-                            _dbContextt.RealTimeCurrencyExchangeRates.Add(item);
-                        }
-                        _dbContextt.SaveChanges();
-                    }
+                        FromCurrencyId = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.BaseCurrency).CurrencyModelId,
+                        ToCurrencyId = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.QuoteCurrency).CurrencyModelId,
+                        ExchangeRate = item.Ask,
+                        LastRefreshedDate = jobject.RequestedTime.ToLocalTime()
+                    };
+                    _dbContextt.RealTimeCurrencyExchangeRates.Add(model);
                 }
+                _dbContextt.SaveChanges();
             }
         }
     }

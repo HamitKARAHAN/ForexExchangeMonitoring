@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ForexCurrencyModelDbContext))]
-    [Migration("20211109122121_ForeignKeyAnnotationAddedMigration2")]
-    partial class ForeignKeyAnnotationAddedMigration2
+    [Migration("20211110224458_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,7 +21,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
                 .HasAnnotation("ProductVersion", "5.0.11")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("ForexExchangeMonitoring.Domain.Models.CurrencyModel", b =>
+            modelBuilder.Entity("ForexExchangeMonitoring.Domain.DbModels.CurrencyModel", b =>
                 {
                     b.Property<int>("CurrencyModelId")
                         .ValueGeneratedOnAdd()
@@ -38,7 +38,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
                     b.ToTable("Currencies");
                 });
 
-            modelBuilder.Entity("ForexExchangeMonitoring.Domain.Models.ForexCurrencyModel", b =>
+            modelBuilder.Entity("ForexExchangeMonitoring.Domain.DbModels.ForexCurrencyModel", b =>
                 {
                     b.Property<int>("ForexCurrencyModelId")
                         .ValueGeneratedOnAdd()
@@ -46,17 +46,15 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
                         .HasColumnName("forex_currency_model_id")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ExchangeRate")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("exchange_rate");
+                    b.Property<double>("ExchangeRate")
+                        .HasColumnType("float");
 
                     b.Property<int>("FromCurrencyId")
                         .HasColumnType("int")
                         .HasColumnName("from_currency_id");
 
                     b.Property<DateTime>("LastRefreshedDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("last_refreshed_date");
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("ToCurrencyId")
                         .HasColumnType("int")
@@ -71,15 +69,15 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
                     b.ToTable("RealTimeCurrencyExchangeRates");
                 });
 
-            modelBuilder.Entity("ForexExchangeMonitoring.Domain.Models.ForexCurrencyModel", b =>
+            modelBuilder.Entity("ForexExchangeMonitoring.Domain.DbModels.ForexCurrencyModel", b =>
                 {
-                    b.HasOne("ForexExchangeMonitoring.Domain.Models.CurrencyModel", "FromCurrency")
+                    b.HasOne("ForexExchangeMonitoring.Domain.DbModels.CurrencyModel", "FromCurrency")
                         .WithMany("FromCurrencyIds")
                         .HasForeignKey("FromCurrencyId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
-                    b.HasOne("ForexExchangeMonitoring.Domain.Models.CurrencyModel", "ToCurrency")
+                    b.HasOne("ForexExchangeMonitoring.Domain.DbModels.CurrencyModel", "ToCurrency")
                         .WithMany("ToCurrencyIds")
                         .HasForeignKey("ToCurrencyId")
                         .OnDelete(DeleteBehavior.ClientCascade)
@@ -90,7 +88,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
                     b.Navigation("ToCurrency");
                 });
 
-            modelBuilder.Entity("ForexExchangeMonitoring.Domain.Models.CurrencyModel", b =>
+            modelBuilder.Entity("ForexExchangeMonitoring.Domain.DbModels.CurrencyModel", b =>
                 {
                     b.Navigation("FromCurrencyIds");
 

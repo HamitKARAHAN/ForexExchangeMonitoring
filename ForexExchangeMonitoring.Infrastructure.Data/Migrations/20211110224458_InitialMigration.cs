@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
 {
-    public partial class ForeignKeyAnnotationAddedMigration : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -28,8 +28,8 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     from_currency_id = table.Column<int>(type: "int", nullable: false),
                     to_currency_id = table.Column<int>(type: "int", nullable: false),
-                    exchange_rate = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    last_refreshed_date = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ExchangeRate = table.Column<double>(type: "float", nullable: false),
+                    LastRefreshedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
