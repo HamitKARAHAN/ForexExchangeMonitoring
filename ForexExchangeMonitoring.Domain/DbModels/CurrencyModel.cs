@@ -17,7 +17,9 @@ namespace ForexExchangeMonitoring.Domain.DbModels
         [Column("currency_name")]
         public string CurrencyName { get; set; }
 
-        public virtual List<ForexCurrencyModel> FromCurrencyIds { get; set; }
-        public virtual List<ForexCurrencyModel> ToCurrencyIds { get; set; }
+        public virtual ICollection<ForexCurrencyRateModel> FromForexCurrencyModels { get; set; }
+
+        public virtual ICollection<ForexCurrencyRateModel> ToForexCurrencyModels { get; set; }
+
     }
 }

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
 {
     public class CurrencyRepository : ICurrencyRepository
@@ -15,54 +14,52 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
             _context = context;
         }
 
-        public IEnumerable<ForexCurrencyModel> GetCurrencies(DateTime now)
+        public void AddLiveExchangeRate(ForexCurrencyRateModel live)
         {
-
-            if (now.Hour >= 18)
-            {
-                DateTime lastInsertDate = new DateTime(now.Year, now.Month, now.Day, 18, 0, 0);
-                return _context.RealTimeCurrencyExchangeRates
-                                                            .Where(c => c.LastRefreshedDate.CompareTo(lastInsertDate) > 0)
-                                                           .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
-            }
-            else if (now.Hour < 9)
-            {
-                DateTime lastInsertDate = new DateTime(now.Year, now.Month, now.Day - 1, 18, 0, 0);
-                return _context.RealTimeCurrencyExchangeRates
-                                                            .Where(c => c.LastRefreshedDate.CompareTo(lastInsertDate) > 0)
-                                                           .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
-            }
-            else if (now.Minute >= 30)
-            {
-                DateTime lastInsertDate = new DateTime(now.Year, now.Month, now.Day, now.Hour, 30, 0);
-                return _context.RealTimeCurrencyExchangeRates
-                                                            .Where(c => c.LastRefreshedDate.CompareTo(lastInsertDate) > 0)
-                                                           .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
-            }
-            else
-            {
-                DateTime lastInsertDate = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0);
-                return _context.RealTimeCurrencyExchangeRates
-                                                            .Where(c => c.LastRefreshedDate.CompareTo(lastInsertDate) > 0)
-                                                            .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
-            }
+            _context.CurrencyExchangeRatesLive.Add(live);
         }
 
-        public IEnumerable<ForexCurrencyModel> GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId)
+        public void AddHistoryExchangeRate(HistoryRateModel history)
+        {
+            _context.CurrencyExchangeRatesHistory.Add(history);
+        }
+
+        public void UpdateDb(ForexCurrencyRateModel live)
+        {
+            _context.Update(live);
+        }
+        public void SaveToDb()
+        {
+            _context.SaveChanges();
+        }
+
+        public IEnumerable<CurrencyModel> GetCurrencies()
+        {
+            return _context.Currencies;
+        }
+        public IEnumerable<ForexCurrencyRateModel> GetLiveCurrencies()
+        {
+            return _context.CurrencyExchangeRatesLive.Include(c => c.FromCurrency).Include(c => c.ToCurrency);
+        }
+
+        public IEnumerable<HistoryRateModel> GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId)
         {
 
             DateTime now = DateTime.Now;
 
-            if(now.Hour>=0 && now.Hour<9)
+            //İstek Gece Saatlerinde Atıldıysa, İstenen Currency için Önceki Günün Tüm History Değerlerini Getir
+            if (now.Hour >= 0 && now.Hour < 9)
             {
                 DateTime lastInsertDate = new DateTime(now.Year, now.Month, now.Day - 1, 9, 0, 0);
-                var x = _context.RealTimeCurrencyExchangeRates
-                                           .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId) && (c.ToCurrency.CurrencyModelId == toCurrencyModelId) && (c.LastRefreshedDate.CompareTo(lastInsertDate) >= 0))
-                                           .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
+                return _context.CurrencyExchangeRatesHistory
+                                                            .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId) && (c.ToCurrency.CurrencyModelId == toCurrencyModelId) && (c.LastRefreshedDate.CompareTo(lastInsertDate) >= 0))
+                                                            .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
             }
-            return _context.RealTimeCurrencyExchangeRates
-                                        .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId) && (c.ToCurrency.CurrencyModelId == toCurrencyModelId) && (c.LastRefreshedDate.Day==now.Day))
-                                        .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
+            return _context.CurrencyExchangeRatesHistory
+                                                        .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId) && (c.ToCurrency.CurrencyModelId == toCurrencyModelId) && (c.LastRefreshedDate.Day == now.Day))
+                                                        .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
         }
+
+
     }
 }

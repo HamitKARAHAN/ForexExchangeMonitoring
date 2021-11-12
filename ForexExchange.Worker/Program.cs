@@ -1,4 +1,6 @@
+using ForexExchangeMonitoring.Domain.Interfaces;
 using ForexExchangeMonitoring.Infrastructure.Data;
+using ForexExchangeMonitoring.Infrastructure.Data.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -21,8 +23,10 @@ namespace ForexExchange.Worker
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddHostedService<Worker>();
+                    services.AddScoped<ICurrencyRepository, CurrencyRepository>();
                     services.AddDbContext<ForexCurrencyModelDbContext>(options =>
                         options.UseSqlServer(hostContext.Configuration.GetConnectionString("myconn")));
+
                 });
     }
 }

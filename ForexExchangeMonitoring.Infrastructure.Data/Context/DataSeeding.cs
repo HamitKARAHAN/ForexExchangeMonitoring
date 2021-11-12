@@ -1,4 +1,5 @@
 ﻿using ForexExchangeMonitoring.Domain.DbModels;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ForexExchangeMonitoring.Infrastructure.Data.Context

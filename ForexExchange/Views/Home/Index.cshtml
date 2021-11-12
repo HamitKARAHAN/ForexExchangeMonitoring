@@ -1,4 +1,4 @@
-﻿@model ForexExchangeMonitoring.Application.ViewModels.ForexCurrencyViewModel
+﻿@model ForexExchangeMonitoring.Application.ViewModels.LiveCurrenciesRateViewModel
 
 <table id="currency" class="table table-bordered table-hover">
     <thead>
@@ -9,13 +9,14 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.ForexCurrencies)
+        @foreach (var item in Model.ForexLiveCurrencies)
         {
+
             <tr style="height:60px;">
                 <td>
                     @Html.ActionLink(item.FromCurrency.CurrencyName + "/" + item.ToCurrency.CurrencyName,
-                                     "History", "Home",
-                                   new { fromCurrencyModelId = item.FromCurrency.CurrencyModelId, toCurrencyModelId = item.ToCurrency.CurrencyModelId })
+                                        "History", "Home",
+                                    new { fromCurrencyModelId = item.FromCurrency.CurrencyModelId, toCurrencyModelId = item.ToCurrency.CurrencyModelId })
                 </td>
                 <td>@item.ExchangeRate</td>
                 <td>@item.LastRefreshedDate.ToString().Substring(0, 16)</td>

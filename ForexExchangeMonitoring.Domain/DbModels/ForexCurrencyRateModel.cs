@@ -8,20 +8,24 @@ using System.Threading.Tasks;
 
 namespace ForexExchangeMonitoring.Domain.DbModels
 {
-    public class ForexCurrencyModel
+    public class ForexCurrencyRateModel
     {
         [Key]
-        [Column("forex_currency_model_id")]
+        [Column("currency_exchange_id")]
         public int ForexCurrencyModelId { get; set; }
 
-        public int FromCurrencyId { get; set; }
-        public virtual CurrencyModel FromCurrency { get; set; }
+        public int? FromCurrencyId { get; set; }
+        public CurrencyModel FromCurrency { get; set; }
 
-        public int ToCurrencyId { get; set; }
-        public virtual CurrencyModel ToCurrency { get; set; }
+        public int? ToCurrencyId { get; set; }
+        public CurrencyModel ToCurrency { get; set; }
 
+        [Column("exchange_rate")]
         public double ExchangeRate { get; set; }
+
+        [Column("last_refreshed_date")]
         public DateTime LastRefreshedDate { get; set; }
 
+        public virtual ICollection<HistoryRateModel> Histories { get; set; }
     }
 }

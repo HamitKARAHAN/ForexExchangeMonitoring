@@ -1,4 +1,4 @@
-﻿@model ForexExchangeMonitoring.Application.ViewModels.ForexCurrencyViewModel
+﻿@model ForexExchangeMonitoring.Application.ViewModels.LiveCurrenciesRateViewModel
 
 <table id="currency" class="table table-bordered table-hover">
     <thead>
@@ -9,7 +9,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.ForexCurrencies)
+        @foreach (var item in Model.ForexHistory)
         {
             <tr style="height:60px;">
                 <td>@item.FromCurrency.CurrencyName/@item.ToCurrency.CurrencyName</td>

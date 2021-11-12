@@ -16,8 +16,8 @@ namespace ForexExchange.Controllers
         // GET: HomeController/Index/
         public ActionResult Index()
         {
-            DateTime now = DateTime.Now;
-            return View(_currencyService.GetCurrencies(now));
+         
+            return View(_currencyService.GetLiveCurrencies());
         }
 
         // GET: HomeController/History/{id1, id2}

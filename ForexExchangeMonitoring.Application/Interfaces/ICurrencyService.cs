@@ -9,7 +9,7 @@ namespace ForexExchangeMonitoring.Application.Interfaces
 {
     public interface ICurrencyService
     {
-        ForexCurrencyViewModel GetCurrencies(DateTime now);
-        ForexCurrencyViewModel GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId);
+        LiveCurrenciesRateViewModel GetLiveCurrencies();
+        LiveCurrenciesRateViewModel GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId);
     }
 }
