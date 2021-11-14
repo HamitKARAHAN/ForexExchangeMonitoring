@@ -1,5 +1,4 @@
 using ForexExchangeMonitoring.Domain.DbModels;
-using ForexExchangeMonitoring.Infrastructure.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -32,15 +31,39 @@ namespace ForexExchange.Worker
 
         private async Task TimeDelay()
         {
-            DateTime now = DateTime.Now;
-            if (now.Hour < 9)
+            DateTime now = DateTime.Now;                    //Þuan
+            DateTime todayMidnight = DateTime.Today;        //Bugün saat 00:00
+            int dayToday = (int)now.DayOfWeek;              //Haftanýn kaçýncý günü?
+            TimeSpan nineHour = TimeSpan.FromHours(9);      //9 saatlik süre
+
+            int waitingTime;
+            //Eger Hafta Ýçi Herhangi Bir Gün Ýse
+            if (dayToday < 6)
             {
-                int waitingTime = (int)(Math.Abs((now - (new DateTime(now.Year, now.Month, now.Day, 9, 0, 0))).TotalMilliseconds));
-                await Task.Delay(waitingTime);
+                if (now.Hour < 9)
+                {
+                    waitingTime = (int)(Math.Abs((now - (todayMidnight + nineHour)).TotalMilliseconds));
+                    await Task.Delay(waitingTime);
+                }
+                else if (now.Hour >= 18 && now.Minute >= 5)
+                {
+                    //Eðer Cuma Akþamý ise Pazartesi Saat Sabah 9'a Kadar Bekle
+                    if (dayToday == 5)
+                    {
+                        waitingTime = (int)(Math.Abs((now - (todayMidnight.AddDays(3) + nineHour)).TotalMilliseconds));
+                        await Task.Delay(waitingTime);
+                        return;
+                    }
+                    //Eðer Hafta içi ise Bir Sonraki Gün Saat Sabah 9'a Kadar Bekle
+                    waitingTime = (int)(Math.Abs((now - (todayMidnight.AddDays(1)+ nineHour)).TotalMilliseconds));
+                    await Task.Delay(waitingTime);
+                }
             }
-            else if (now.Hour >= 18 && now.Minute >= 10)
+            else
             {
-                int waitingTime = (int)(Math.Abs((now - (new DateTime(now.Year, now.Month, now.Day + 1, 9, 0, 0))).TotalMilliseconds));
+                //Eðer Hafta Sonu Herhangi Bir Gün ise Gelecek Pazartesiye kadar bekle
+                int daysUntilNextMonday = ((int)DayOfWeek.Monday - dayToday + 7) % 7;
+                waitingTime = (int)(Math.Abs((now - (todayMidnight.AddDays(daysUntilNextMonday)+ nineHour)).TotalMilliseconds));
                 await Task.Delay(waitingTime);
             }
         }
@@ -51,7 +74,7 @@ namespace ForexExchange.Worker
             while (!stoppingToken.IsCancellationRequested)
             {
                 await TimeDelay();
-                _logger.LogInformation("Worker running at:   {time}", DateTime.Now);
+                _logger.LogInformation("Worker running at   ===========>   {time}", DateTime.Now);
                 try
                 {
                     using (IServiceScope scope = _serviceProvider.CreateScope())
@@ -89,84 +112,6 @@ namespace ForexExchange.Worker
                 }
                 else
                     SaveForexDatas(_currencyRepository, jsonModel, currenciesFromDb, liveCurrenciesFromDb);
-            }
-
-            {
-                //#region   --Bu kod bloðu sadece bir kez, program baþlatýldýðýnda çalýþacak--
-                //if (isFirstRunning)
-                //{
-                //    foreach (var item in jobject.Quotes)
-                //    {
-                //        var entity = liveCurrenciesFromDb
-                //                .FirstOrDefault(c => (c.FromCurrency.CurrencyName == item.BaseCurrency) && (c.ToCurrency.CurrencyName == item.QuoteCurrency));
-                //        ForexCurrencyRateModel live = new();
-                //        if (entity == null)
-                //        {
-                //            live.FromCurrencyId = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.BaseCurrency).CurrencyModelId;
-                //            live.ToCurrencyId = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.QuoteCurrency).CurrencyModelId;
-                //            live.FromCurrency = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.BaseCurrency);
-                //            live.ToCurrency = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.QuoteCurrency);
-                //            live.ExchangeRate = item.Ask;
-                //            live.LastRefreshedDate = jobject.RequestedTime.ToLocalTime();
-
-                //            //RealTime Tablosuna Ekle
-                //            _currencyRepository.AddLiveExchangeRate(live);
-                //        }
-                //        else
-                //        {
-                //            HistoryRateModel history = new()
-                //            {
-                //                FromCurrencyId = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.BaseCurrency).CurrencyModelId,
-                //                ToCurrencyId = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.QuoteCurrency).CurrencyModelId,
-                //                FromCurrency = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.BaseCurrency),
-                //                ToCurrency = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.QuoteCurrency),
-                //                ExchangeRate = item.Ask,
-                //                LastRefreshedDate = jobject.RequestedTime.ToLocalTime(),
-                //                ForexCurrencyModel = entity ?? live
-                //            };
-                //            //History Tablosuna Ekle
-                //            _currencyRepository.AddHistoryExchangeRate(history);
-
-                //            //RealTime Tablosunundaki sadece geerekli alanlarý güncelle
-                //            entity.ExchangeRate = item.Ask;
-                //            entity.LastRefreshedDate = jobject.RequestedTime.ToLocalTime();
-                //            _currencyRepository.UpdateDb(entity);
-                //        }
-
-                //    }
-                //    //sayacý artýralým ve bu döngüye bir daha asla girmesin
-                //    isFirstRunning = false;
-                //    //Ýki Tabloyu da Kaydet
-                //    _currencyRepository.SaveToDb();
-                //    return;
-                //}
-                //#endregion
-
-                //foreach (var item in jobject.Quotes)
-                //{
-                //    var entity = liveCurrenciesFromDb
-                //        .FirstOrDefault(c => (c.FromCurrency.CurrencyName == item.BaseCurrency) && (c.ToCurrency.CurrencyName == item.QuoteCurrency));
-
-                //    HistoryRateModel history = new()
-                //    {
-                //        FromCurrencyId = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.BaseCurrency).CurrencyModelId,
-                //        ToCurrencyId = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.QuoteCurrency).CurrencyModelId,
-                //        FromCurrency = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.BaseCurrency),
-                //        ToCurrency = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.QuoteCurrency),
-                //        ExchangeRate = item.Ask,
-                //        LastRefreshedDate = jobject.RequestedTime.ToLocalTime(),
-                //        ForexCurrencyModel = entity
-                //    };
-                //    //History Tablosuna ekle
-                //    _currencyRepository.AddHistoryExchangeRate(history);
-
-                //    //RealTime Tablosunundaki sadece geerekli alanlarý güncelle
-                //    entity.ExchangeRate = item.Ask;
-                //    entity.LastRefreshedDate = jobject.RequestedTime.ToLocalTime();
-                //    _currencyRepository.UpdateDb(entity);
-                //}
-                ////Ýki tabloyu da Kaydet
-                //_currencyRepository.SaveToDb();
             }
         }
 

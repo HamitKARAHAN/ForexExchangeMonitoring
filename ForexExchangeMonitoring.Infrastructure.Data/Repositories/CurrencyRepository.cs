@@ -55,6 +55,13 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
                                                             .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId) && (c.ToCurrency.CurrencyModelId == toCurrencyModelId) && (c.LastRefreshedDate.CompareTo(lastInsertDate) >= 0))
                                                             .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
             }
+
+            var x = _context.CurrencyExchangeRatesHistory
+                                                        .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId) && (c.ToCurrency.CurrencyModelId == toCurrencyModelId) && (c.LastRefreshedDate.Day == now.Day))
+                                                        .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
+
+
+
             return _context.CurrencyExchangeRatesHistory
                                                         .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId) && (c.ToCurrency.CurrencyModelId == toCurrencyModelId) && (c.LastRefreshedDate.Day == now.Day))
                                                         .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
