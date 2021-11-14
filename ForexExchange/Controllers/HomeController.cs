@@ -1,6 +1,9 @@
 ﻿using ForexExchangeMonitoring.Application.Interfaces;
+using ForexExchangeMonitoring.Domain.DbModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
+using System.Collections.Generic;
 
 namespace ForexExchange.Controllers
 {
@@ -16,7 +19,6 @@ namespace ForexExchange.Controllers
         // GET: HomeController/Index/
         public ActionResult Index()
         {
-         
             return View(_currencyService.GetLiveCurrencies());
         }
 

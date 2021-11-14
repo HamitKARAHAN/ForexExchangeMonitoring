@@ -14,21 +14,32 @@ namespace ForexExchangeMonitoring.Application.Services
         {
             _currencyRepository = currencyRepository;
         }
-        public LiveCurrenciesRateViewModel GetLiveCurrencies()
+
+        public CurrenciesRateViewModel GetCurrencies()
         {
-            return new LiveCurrenciesRateViewModel()
+            return new CurrenciesRateViewModel()
+            {
+                Currencies = _currencyRepository.GetCurrencies()
+            };
+        }
+
+        public CurrenciesRateViewModel GetLiveCurrencies()
+        {
+            return new CurrenciesRateViewModel()
             {
                 ForexLiveCurrencies = _currencyRepository.GetLiveCurrencies()
             };
         }
 
-        LiveCurrenciesRateViewModel ICurrencyService.GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId)
+        CurrenciesRateViewModel ICurrencyService.GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId)
         {
-            return new LiveCurrenciesRateViewModel()
+            return new CurrenciesRateViewModel()
             {
                 ForexHistory = _currencyRepository.GetCurrencyHistory(fromCurrencyModelId, toCurrencyModelId)
             };
         }
+
+
     }
 }
 

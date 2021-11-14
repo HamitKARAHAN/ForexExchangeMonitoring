@@ -9,7 +9,7 @@ namespace ForexExchangeMonitoring.Domain.Interfaces
 {
     public interface ICurrencyRepository
     {
-        IEnumerable<CurrencyModel> GetCurrencies();
+        List<CurrencyModel> GetCurrencies();
         IEnumerable<ForexCurrencyRateModel> GetLiveCurrencies();
         IEnumerable<HistoryRateModel> GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId);
 

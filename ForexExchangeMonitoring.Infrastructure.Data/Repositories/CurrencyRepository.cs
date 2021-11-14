@@ -33,9 +33,9 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
             _context.SaveChanges();
         }
 
-        public IEnumerable<CurrencyModel> GetCurrencies()
+        public List<CurrencyModel> GetCurrencies()
         {
-            return _context.Currencies;
+            return _context.Currencies.ToList();
         }
         public IEnumerable<ForexCurrencyRateModel> GetLiveCurrencies()
         {

@@ -41,7 +41,7 @@ namespace ForexExchange.Worker
             if (dayToday < 6)
             {
                 if (now.Hour < 9)
-                {
+                {                            //(Þimdi - (Bugün saat sabah 9'u getirir))
                     waitingTime = (int)(Math.Abs((now - (todayMidnight + nineHour)).TotalMilliseconds));
                     await Task.Delay(waitingTime);
                 }
@@ -49,13 +49,13 @@ namespace ForexExchange.Worker
                 {
                     //Eðer Cuma Akþamý ise Pazartesi Saat Sabah 9'a Kadar Bekle
                     if (dayToday == 5)
-                    {
+                    {                            //(Þimdi - (Pazartesi saat sabah 9'u getirir))
                         waitingTime = (int)(Math.Abs((now - (todayMidnight.AddDays(3) + nineHour)).TotalMilliseconds));
                         await Task.Delay(waitingTime);
                         return;
                     }
                     //Eðer Hafta içi ise Bir Sonraki Gün Saat Sabah 9'a Kadar Bekle
-                    waitingTime = (int)(Math.Abs((now - (todayMidnight.AddDays(1)+ nineHour)).TotalMilliseconds));
+                    waitingTime = (int)(Math.Abs((now - (todayMidnight.AddDays(1) + nineHour)).TotalMilliseconds));
                     await Task.Delay(waitingTime);
                 }
             }
@@ -63,13 +63,14 @@ namespace ForexExchange.Worker
             {
                 //Eðer Hafta Sonu Herhangi Bir Gün ise Gelecek Pazartesiye kadar bekle
                 int daysUntilNextMonday = ((int)DayOfWeek.Monday - dayToday + 7) % 7;
-                waitingTime = (int)(Math.Abs((now - (todayMidnight.AddDays(daysUntilNextMonday)+ nineHour)).TotalMilliseconds));
+                waitingTime = (int)(Math.Abs((now - (todayMidnight.AddDays(daysUntilNextMonday) + nineHour)).TotalMilliseconds));
                 await Task.Delay(waitingTime);
             }
         }
 
         protected async override Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            string QUERY_URL = _configuration.GetConnectionString("QUERY_URL");
             bool isFirstRunning = true;
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -80,28 +81,28 @@ namespace ForexExchange.Worker
                     using (IServiceScope scope = _serviceProvider.CreateScope())
                     {
                         var currencyRepository = scope.ServiceProvider.GetService<ICurrencyRepository>();
-                        await GetForexDatas(currencyRepository, isFirstRunning);
+                        await GetForexDatas(QUERY_URL, currencyRepository, isFirstRunning);
                     }
                     await Task.Delay(1800000, stoppingToken);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "An error occurred while inserting to DB");
+                    _logger.LogError(ex, "An error occurred");
                     return;
                 }
             }
         }
 
-        private async Task GetForexDatas(ICurrencyRepository _currencyRepository, bool isFirstRunning)
+        private async Task GetForexDatas(string QUERY_URL, ICurrencyRepository _currencyRepository, bool isFirstRunning)
         {
-            string QUERY_URL = _configuration.GetConnectionString("QUERY_URL");
+
             using (var _client = new HttpClient())
             {
                 var response = await _client.GetAsync(QUERY_URL);
                 string responseBody = await response.Content.ReadAsStringAsync();
                 Root jsonModel = JsonConvert.DeserializeObject<Root>(responseBody);
 
-                var currenciesFromDb = _currencyRepository.GetCurrencies().ToList();
+                var currenciesFromDb = _currencyRepository.GetCurrencies();
                 var liveCurrenciesFromDb = _currencyRepository.GetLiveCurrencies().ToList();
 
                 //Program ilk defa çalýþýyorsa
