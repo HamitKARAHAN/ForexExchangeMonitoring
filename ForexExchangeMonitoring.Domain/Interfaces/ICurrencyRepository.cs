@@ -13,8 +13,6 @@ namespace ForexExchangeMonitoring.Domain.Interfaces
         IEnumerable<ForexCurrencyRateModel> GetLiveCurrencies();
         IEnumerable<HistoryRateModel> GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId);
 
-
-
         public void AddLiveExchangeRate(ForexCurrencyRateModel live);
 
         public void AddHistoryExchangeRate(HistoryRateModel history);

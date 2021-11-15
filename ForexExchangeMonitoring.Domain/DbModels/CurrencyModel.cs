@@ -20,6 +20,5 @@ namespace ForexExchangeMonitoring.Domain.DbModels
         public virtual ICollection<ForexCurrencyRateModel> FromForexCurrencyModels { get; set; }
 
         public virtual ICollection<ForexCurrencyRateModel> ToForexCurrencyModels { get; set; }
-
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ForexExchangeMonitoring.Application.Interfaces;
+using ForexExchangeMonitoring.Application.ViewModels;
 using ForexExchangeMonitoring.Domain.DbModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
