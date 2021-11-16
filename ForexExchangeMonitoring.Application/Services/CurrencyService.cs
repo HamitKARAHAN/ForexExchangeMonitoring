@@ -23,11 +23,11 @@ namespace ForexExchangeMonitoring.Application.Services
             };
         }
 
-        public LiveCurrenciesRateViewModel GetLiveCurrencies()
+        public LiveCurrenciesRateViewModel GetLiveCurrencies(string sortOrder, string fromCurrencySerachString, string toCurrencySerachString, string rateCurrencySearchString)
         {
             return new LiveCurrenciesRateViewModel()
             {
-                ForexLiveCurrencies = _currencyRepository.GetLiveCurrencies()
+                ForexLiveCurrencies = _currencyRepository.GetLiveCurrencies(sortOrder, fromCurrencySerachString, toCurrencySerachString, rateCurrencySearchString)
             };
         }
 

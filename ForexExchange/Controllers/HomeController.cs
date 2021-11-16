@@ -1,10 +1,6 @@
 ﻿using ForexExchangeMonitoring.Application.Interfaces;
-using ForexExchangeMonitoring.Application.ViewModels;
-using ForexExchangeMonitoring.Domain.DbModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
-using System.Collections.Generic;
 
 namespace ForexExchange.Controllers
 {
@@ -18,9 +14,18 @@ namespace ForexExchange.Controllers
         }
 
         // GET: HomeController/Index/
-        public ActionResult Index()
+        public IActionResult Index(string sortOrder, string fromCurrencySerachString, string toCurrencySerachString, string rateCurrencySearchString)
         {
-            return View(_currencyService.GetLiveCurrencies());
+            #region Sorting Datas
+            ViewData["FromSortParam"] = sortOrder == "from_asc" ? "from_desc" : "from_asc";
+            ViewData["ToSortParam"] = sortOrder == "to_asc" ? "to_desc" : "to_asc";
+            ViewData["RateSortParam"] = sortOrder == "rate_asc" ? "rate_desc" : "rate_asc";
+
+            ViewData["FromCurrencyFilter"] = fromCurrencySerachString;
+            ViewData["ToCurrencyFilter"] = toCurrencySerachString;
+            ViewData["RateCurrencyFilter"] = rateCurrencySearchString;
+            #endregion
+            return View(_currencyService.GetLiveCurrencies(sortOrder, fromCurrencySerachString, toCurrencySerachString, rateCurrencySearchString));
         }
 
         // GET: HomeController/History/{id1, id2}

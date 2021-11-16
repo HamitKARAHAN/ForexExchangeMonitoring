@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+
 namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
 {
     public class CurrencyRepository : ICurrencyRepository
@@ -37,9 +39,32 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
         {
             return _context.Currencies.ToList();
         }
-        public IEnumerable<ForexCurrencyRateModel> GetLiveCurrencies()
+        public IEnumerable<ForexCurrencyRateModel> GetLiveCurrencies(string sortOrder, string fromCurrencySerachString, string toCurrencySerachString, string rateCurrencySearchString)
         {
-            return _context.CurrencyExchangeRatesLive.Include(c => c.FromCurrency).Include(c => c.ToCurrency);
+            var liveCurrencies = _context.CurrencyExchangeRatesLive.AsQueryable();
+            if (!String.IsNullOrEmpty(fromCurrencySerachString))
+            {
+                liveCurrencies = liveCurrencies.Where(s =>s.FromCurrency.CurrencyName == fromCurrencySerachString);
+            }
+            if (!String.IsNullOrEmpty(toCurrencySerachString))
+            {
+                liveCurrencies = liveCurrencies.Where(s =>s.ToCurrency.CurrencyName == toCurrencySerachString);
+            }
+            if (!String.IsNullOrEmpty(rateCurrencySearchString))
+            {
+                liveCurrencies = liveCurrencies.Where(s => s.ExchangeRate<Double.Parse(rateCurrencySearchString));
+            }
+
+            return sortOrder switch
+            {
+                "from_desc" => liveCurrencies.OrderByDescending(s => s.FromCurrency.CurrencyName).Include(c => c.FromCurrency).Include(c => c.ToCurrency),
+                "from_asc" => liveCurrencies.OrderBy(s => s.FromCurrency.CurrencyName).Include(c => c.FromCurrency).Include(c => c.ToCurrency),
+                "to_desc" => liveCurrencies.OrderByDescending(s => s.ToCurrency.CurrencyName).Include(c => c.FromCurrency).Include(c => c.ToCurrency),
+                "to_asc" => liveCurrencies.OrderBy(s => s.ToCurrency.CurrencyName).Include(c => c.FromCurrency).Include(c => c.ToCurrency),
+                "rate_desc" => liveCurrencies.OrderByDescending(s => s.ExchangeRate).Include(c => c.FromCurrency).Include(c => c.ToCurrency),
+                "rate_asc" => liveCurrencies.OrderBy(s => s.ExchangeRate).Include(c => c.FromCurrency).Include(c => c.ToCurrency),
+                _ => liveCurrencies.Include(c => c.FromCurrency).Include(c => c.ToCurrency),
+            };
         }
 
         public IEnumerable<HistoryRateModel> GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId)

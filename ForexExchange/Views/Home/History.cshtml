@@ -1,10 +1,13 @@
 ﻿@model ForexExchangeMonitoring.Application.ViewModels.CurrenciesHistoryRateViewModel
-
-<table id="currency" class="table table-striped table-bordered">
+@{
+    ViewBag.Title = "Forex - History";
+}
+<table id="currency"  class="table table-active table-bordered table-hover">
     <thead>
         <tr class="">
-            <th>Currency</th>
-            <th>Rate</th>
+            <th>From Currency</th>
+            <th>To Currency</th>
+            <th>Exchange Rate</th>
             <th>Last Modified Date</th>
         </tr>
     </thead>
@@ -12,9 +15,10 @@
         @foreach (var item in Model.ForexHistory)
         {
             <tr style="height:60px;">
-                <td>@item.FromCurrency.CurrencyName/@item.ToCurrency.CurrencyName</td>
+                <td>@item.FromCurrency.CurrencyName</td>
+                <td>@item.ToCurrency.CurrencyName</td>
                 <td>@item.ExchangeRate</td>
-                <td>@item.LastRefreshedDate.ToString().Substring(0, 16)</td>
+                <td>@item.LastRefreshedDate</td>
             </tr>
         }
     </tbody>

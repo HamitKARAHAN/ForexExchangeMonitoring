@@ -1,5 +1,6 @@
 ﻿using ForexExchangeMonitoring.Domain.DbModels;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ForexExchangeMonitoring.Application.ViewModels
 {

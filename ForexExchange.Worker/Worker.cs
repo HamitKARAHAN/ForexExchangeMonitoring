@@ -83,7 +83,7 @@ namespace ForexExchange.Worker
                         var currencyRepository = scope.ServiceProvider.GetService<ICurrencyRepository>();
                         await GetForexDatas(QUERY_URL, currencyRepository, isFirstRunning);
                     }
-                    await Task.Delay(1800000, stoppingToken);
+                    await Task.Delay(10000, stoppingToken);
                 }
                 catch (Exception ex)
                 {
@@ -103,7 +103,7 @@ namespace ForexExchange.Worker
                 Root jsonModel = JsonConvert.DeserializeObject<Root>(responseBody);
 
                 var currenciesFromDb = _currencyRepository.GetCurrencies();
-                var liveCurrenciesFromDb = _currencyRepository.GetLiveCurrencies().ToList();
+                var liveCurrenciesFromDb = _currencyRepository.GetLiveCurrencies("",null,null,null).ToList();
 
                 //Program ilk defa çalýþýyorsa
                 if (isFirstRunning)

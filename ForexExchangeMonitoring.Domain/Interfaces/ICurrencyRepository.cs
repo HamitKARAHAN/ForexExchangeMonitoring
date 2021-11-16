@@ -14,7 +14,7 @@ namespace ForexExchangeMonitoring.Domain.Interfaces
         public void UpdateDb(ForexCurrencyRateModel live);
         public void SaveToDb();
         List<CurrencyModel> GetCurrencies();
-        IEnumerable<ForexCurrencyRateModel> GetLiveCurrencies();
+        IEnumerable<ForexCurrencyRateModel> GetLiveCurrencies(string sortOrder, string fromCurrencySerachString, string toCurrencySerachString, string rateCurrencySearchString);
         IEnumerable<HistoryRateModel> GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId);
     }
 }
