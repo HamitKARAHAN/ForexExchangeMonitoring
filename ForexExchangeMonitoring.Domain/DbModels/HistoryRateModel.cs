@@ -25,6 +25,6 @@ namespace ForexExchangeMonitoring.Domain.DbModels
 
         [Column("last_refreshed_date")]
         public DateTime LastRefreshedDate { get; set; }
-        public ForexCurrencyRateModel ForexCurrencyModel{ get; set; }
+        public ForexCurrencyRateModel ForexCurrencyModel { get; set; }
     }
 }
