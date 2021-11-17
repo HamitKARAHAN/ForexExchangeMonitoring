@@ -83,7 +83,7 @@ namespace ForexExchange.Worker
                         var currencyRepository = scope.ServiceProvider.GetService<ICurrencyRepository>();
                         await GetForexDatas(QUERY_URL, currencyRepository, isFirstRunning);
                     }
-                    await Task.Delay(10000, stoppingToken);
+                    await Task.Delay(1800000, stoppingToken);
                 }
                 catch (Exception ex)
                 {

@@ -32,11 +32,6 @@ namespace ForexExchange.Controllers
 
         public IActionResult IndexSearch(string from, string to, string minRate)
         {
-            #region Searching Datas
-            ViewData["FromCurrencyFilter"] = from;
-            ViewData["ToCurrencyFilter"] = to;
-            ViewData["RateCurrencyFilter"] = minRate;
-            #endregion
             return View("Index", _currencyService.GetLiveCurrenciesBySearch(from, to, minRate));
         }
 

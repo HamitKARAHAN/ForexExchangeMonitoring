@@ -72,7 +72,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
             }
             if (!String.IsNullOrEmpty(min))
             {
-                liveCurrencies = liveCurrencies.Where(s => s.ExchangeRate < Double.Parse(min));
+                liveCurrencies = liveCurrencies.Where(s => s.ExchangeRate > Double.Parse(min));
             }
             return liveCurrencies.Include(c => c.FromCurrency).Include(c => c.ToCurrency);
 

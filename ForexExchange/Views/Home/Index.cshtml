@@ -7,9 +7,9 @@
 <form asp-action="IndexSearch" method="get">
     <div class="form-actions no-color">
         <p>
-            From: <input type="text" name="from" value="@ViewData["FromCurrencyFilter"]" />
-            To: <input type="text" name="to" value="@ViewData["ToCurrencyFilter"]" />
-            Min Rate: <input type="text" name="minRate" value="@ViewData["RateCurrencyFilter"]" />
+            From: <input type="text" name="from" id="from"/>
+            To: <input type="text" name="to" id="to"  />
+            Min Rate: <input type="text" name="minRate" id="minRate" />
             &nbsp; <input type="submit" value="Search" class="btn btn-danger" style="height: 30px; text-align: center; line-height: 12px; margin: 20px auto; " />&nbsp; |
             <a asp-action="Index">Back to Full List</a>
         </p>
