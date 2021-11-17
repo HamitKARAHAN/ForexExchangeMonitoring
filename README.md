@@ -2,7 +2,7 @@
 
  ### ⚡️ Quickstart - Summary
 
-  This is a simple project for creating a WebApp with ASP.NET Core with the principles of Clean Architecture. 
+  This is a simple project for creating a WebApp with ASP.NET Core and with the principles of Clean Architecture. 
 In project, we are taking Forex Exchange Rates for chosen currencies by consuming some Api providers. Firstly, We have a Worker running in Background once every 30 minutes between 9 am and 6 pm on weekdays. Our Worker sending request to API provider, taking our Exchange datas and recording our local database with the help of our DbContext. In the other hand, We have a ASP.NET Core MVC Project taking this datas from our DbContext and routing to our endpoints.
 
 ## Technologies & Architectures
