@@ -1,4 +1,4 @@
-# ForexExchangeMonitoring
+# Forex Exchange Monitoring
 
  ### ⚡️ Quickstart - Summary
 
