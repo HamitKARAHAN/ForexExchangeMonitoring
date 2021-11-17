@@ -25,7 +25,8 @@ In project, we are taking Forex Exchange Rates for chosen currencies with the he
 
 ### Project Architecture
 
-![abcc](https://user-images.githubusercontent.com/73249548/142173118-e33dcdd4-3bf0-41ea-9f1c-a43f6de8b493.png)
+![dddd](https://user-images.githubusercontent.com/73249548/142181292-f3d4d656-b8c2-49b6-ad39-4530635b367e.png)
+
 
 
 ### Domain
