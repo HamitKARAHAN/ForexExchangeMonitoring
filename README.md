@@ -14,7 +14,7 @@ In project, we are taking Forex Exchange Rates for chosen currencies with the he
 ## Getting Started
 
 - Clone Project to from Visual Stuido or VS Code
-- Open the project folder. Then open `~ForexExchange/appsettings.json` Change your Sql Connection String from here and `~ForexExchange.Worker/appsettings.json` here (if you want to use Visual Studio local mssqlDb, don't do anything)
+- Open the project folder. Then open `~src/ForexExchange/appsettings.json` Change your Sql Connection String from here and `~src/ForexExchange.Worker/appsettings.json` here (if you want to use Visual Studio local mssqlDb, don't do anything)
 - Set `ForexExchange` to your Startup Project
 - Migrate the database using command  `Add-Migration "MigrationName" -Context ForexCurrencyModelDbContext`
 - Update the databse using command `Update-Database -Context ForexCurrencyModelDbContext`
