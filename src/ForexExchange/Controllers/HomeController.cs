@@ -13,13 +13,6 @@ namespace ForexExchange.Controllers
             _currencyService = currencyService;
         }
 
-        // GET: HomeController/Index/
-        public IActionResult Index()
-        {
-            return View(_currencyService.GetLiveCurrencies());
-        }
-
-        [Route("Home/Index/{sortOrder?}")]
         public IActionResult Index(string sortOrder)
         {
             #region Sorting Datas

@@ -10,7 +10,7 @@
             From: <input type="text" name="from" id="from"/>
             To: <input type="text" name="to" id="to"  />
             Min Rate: <input type="text" name="minRate" id="minRate" />
-            &nbsp; <input type="submit" value="Search" class="btn btn-danger" style="height: 30px; text-align: center; line-height: 12px; margin: 20px auto; " />&nbsp; |
+            &nbsp; <input type="submit" value="Search" class="btn btn-outline-success btn-light" style="height: 30px; text-align: center; line-height: 12px; margin: 20px auto; " />&nbsp; |
             <a asp-action="Index">Back to Full List</a>
         </p>
     </div>
@@ -28,7 +28,7 @@
     <tbody>
         @foreach (var item in Model.ForexLiveCurrencies)
         {
-            <tr style="height:60px;">
+            <tr style="height:50px;">
                 <td>@item.FromCurrency.CurrencyName</td>
                 <td>@item.ToCurrency.CurrencyName</td>
                 <td>@item.ExchangeRate</td>
