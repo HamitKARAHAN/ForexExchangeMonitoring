@@ -39,22 +39,14 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
         {
             return _context.Currencies.ToList();
         }
-        public IEnumerable<ForexCurrencyRateModel> GetLiveCurrencies(string sortOrder, string fromCurrencySerachString, string toCurrencySerachString, string rateCurrencySearchString)
+        public IEnumerable<ForexCurrencyRateModel> GetLiveCurrencies()
+        {
+            return _context.CurrencyExchangeRatesLive.Include(c => c.FromCurrency).Include(c => c.ToCurrency);
+        }
+
+        public IEnumerable<ForexCurrencyRateModel> GetLiveCurrenciesBySort(string sortOrder)
         {
             var liveCurrencies = _context.CurrencyExchangeRatesLive.AsQueryable();
-            if (!String.IsNullOrEmpty(fromCurrencySerachString))
-            {
-                liveCurrencies = liveCurrencies.Where(s =>s.FromCurrency.CurrencyName == fromCurrencySerachString);
-            }
-            if (!String.IsNullOrEmpty(toCurrencySerachString))
-            {
-                liveCurrencies = liveCurrencies.Where(s =>s.ToCurrency.CurrencyName == toCurrencySerachString);
-            }
-            if (!String.IsNullOrEmpty(rateCurrencySearchString))
-            {
-                liveCurrencies = liveCurrencies.Where(s => s.ExchangeRate<Double.Parse(rateCurrencySearchString));
-            }
-
             return sortOrder switch
             {
                 "from_desc" => liveCurrencies.OrderByDescending(s => s.FromCurrency.CurrencyName).Include(c => c.FromCurrency).Include(c => c.ToCurrency),
@@ -65,6 +57,26 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
                 "rate_asc" => liveCurrencies.OrderBy(s => s.ExchangeRate).Include(c => c.FromCurrency).Include(c => c.ToCurrency),
                 _ => liveCurrencies.Include(c => c.FromCurrency).Include(c => c.ToCurrency),
             };
+
+        }
+        public IEnumerable<ForexCurrencyRateModel> GetLiveCurrenciesBySearch(string from, string to, string min)
+        {
+            var liveCurrencies = _context.CurrencyExchangeRatesLive.AsQueryable();
+            if (!String.IsNullOrEmpty(from))
+            {
+                liveCurrencies = liveCurrencies.Where(s => s.FromCurrency.CurrencyName == from);
+            }
+            if (!String.IsNullOrEmpty(to))
+            {
+                liveCurrencies = liveCurrencies.Where(s => s.ToCurrency.CurrencyName == to);
+            }
+            if (!String.IsNullOrEmpty(min))
+            {
+                liveCurrencies = liveCurrencies.Where(s => s.ExchangeRate < Double.Parse(min));
+            }
+            return liveCurrencies.Include(c => c.FromCurrency).Include(c => c.ToCurrency);
+
+
         }
 
         public IEnumerable<HistoryRateModel> GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId)

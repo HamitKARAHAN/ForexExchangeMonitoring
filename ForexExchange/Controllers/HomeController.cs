@@ -14,19 +14,32 @@ namespace ForexExchange.Controllers
         }
 
         // GET: HomeController/Index/
-        public IActionResult Index(string sortOrder, string fromCurrencySerachString, string toCurrencySerachString, string rateCurrencySearchString)
+        public IActionResult Index()
+        {
+            return View(_currencyService.GetLiveCurrencies());
+        }
+
+        [Route("Home/Index/{sortOrder?}")]
+        public IActionResult Index(string sortOrder)
         {
             #region Sorting Datas
             ViewData["FromSortParam"] = sortOrder == "from_asc" ? "from_desc" : "from_asc";
             ViewData["ToSortParam"] = sortOrder == "to_asc" ? "to_desc" : "to_asc";
             ViewData["RateSortParam"] = sortOrder == "rate_asc" ? "rate_desc" : "rate_asc";
-
-            ViewData["FromCurrencyFilter"] = fromCurrencySerachString;
-            ViewData["ToCurrencyFilter"] = toCurrencySerachString;
-            ViewData["RateCurrencyFilter"] = rateCurrencySearchString;
             #endregion
-            return View(_currencyService.GetLiveCurrencies(sortOrder, fromCurrencySerachString, toCurrencySerachString, rateCurrencySearchString));
+            return View(_currencyService.GetLiveCurrenciesBySort(sortOrder));
         }
+
+        public IActionResult IndexSearch(string from, string to, string minRate)
+        {
+            #region Searching Datas
+            ViewData["FromCurrencyFilter"] = from;
+            ViewData["ToCurrencyFilter"] = to;
+            ViewData["RateCurrencyFilter"] = minRate;
+            #endregion
+            return View("Index", _currencyService.GetLiveCurrenciesBySearch(from, to, minRate));
+        }
+
 
         // GET: HomeController/History/{id1, id2}
         public ActionResult History(int fromCurrencyModelId, int toCurrencyModelId)

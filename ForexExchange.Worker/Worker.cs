@@ -103,7 +103,7 @@ namespace ForexExchange.Worker
                 Root jsonModel = JsonConvert.DeserializeObject<Root>(responseBody);
 
                 var currenciesFromDb = _currencyRepository.GetCurrencies();
-                var liveCurrenciesFromDb = _currencyRepository.GetLiveCurrencies("",null,null,null).ToList();
+                var liveCurrenciesFromDb = _currencyRepository.GetLiveCurrencies().ToList();
 
                 //Program ilk defa çalýþýyorsa
                 if (isFirstRunning)
