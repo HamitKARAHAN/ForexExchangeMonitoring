@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31727.386
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForexExchange", "ForexExchange\ForexExchange.csproj", "{21FAA083-4B86-4129-A075-F1027B2F754B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForexExchange", "src\ForexExchange\ForexExchange.csproj", "{21FAA083-4B86-4129-A075-F1027B2F754B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForexExchangeMonitoring.Domain", "ForexExchangeMonitoring.Domain\ForexExchangeMonitoring.Domain.csproj", "{76515E31-548F-4267-AD32-DE9F8D7D8219}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForexExchangeMonitoring.Domain", "src\ForexExchangeMonitoring.Domain\ForexExchangeMonitoring.Domain.csproj", "{76515E31-548F-4267-AD32-DE9F8D7D8219}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForexExchangeMonitoring.Infrastructure.Data", "ForexExchangeMonitoring.Infrastructure.Data\ForexExchangeMonitoring.Infrastructure.Data.csproj", "{EE965435-E448-42E6-BA66-10F18D63A654}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForexExchangeMonitoring.Infrastructure.Data", "src\ForexExchangeMonitoring.Infrastructure.Data\ForexExchangeMonitoring.Infrastructure.Data.csproj", "{EE965435-E448-42E6-BA66-10F18D63A654}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForexExchangeMonitoring.Application", "ForexExchangeMonitoring.Application\ForexExchangeMonitoring.Application.csproj", "{381FB877-3293-44C8-80D0-2151875FEB64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForexExchangeMonitoring.Application", "src\ForexExchangeMonitoring.Application\ForexExchangeMonitoring.Application.csproj", "{381FB877-3293-44C8-80D0-2151875FEB64}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForexExchange.Worker", "ForexExchange.Worker\ForexExchange.Worker.csproj", "{BFFE2242-8E55-43A6-8E07-79FE14316A8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForexExchange.Worker", "src\ForexExchange.Worker\ForexExchange.Worker.csproj", "{BFFE2242-8E55-43A6-8E07-79FE14316A8A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
