@@ -1,15 +1,14 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @model ForexExchangeMonitoring.Application.ViewModels.LiveCurrenciesRateViewModel
-
 @{
     ViewBag.Title = "Forex - Live";
 }
 <form asp-action="IndexSearch" method="get">
-    <div class="form-actions no-color">
-        <p>
-            From: <input type="text" name="from" id="from"/>
-            To: <input type="text" name="to" id="to"  />
-            Min Rate: <input type="text" name="minRate" id="minRate" />
+    <div class="form-group no-color ">
+        <p class="font-weight-bold">
+            From: <input type="text" class="border-info" name="from" id="from" />&nbsp;&nbsp;
+            To: <input type="text" class="border-info" name="to" id="to" />&nbsp;&nbsp;
+            Min Rate: <input type="text" class="border-info" name="minRate" id="minRate" />&nbsp;&nbsp;
             &nbsp; <input type="submit" value="Search" class="btn btn-outline-success btn-light" style="height: 30px; text-align: center; line-height: 12px; margin: 20px auto; " />&nbsp; |
             <a asp-action="Index">Back to Full List</a>
         </p>

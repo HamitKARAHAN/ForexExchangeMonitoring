@@ -75,8 +75,6 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
                 liveCurrencies = liveCurrencies.Where(s => s.ExchangeRate > Double.Parse(min));
             }
             return liveCurrencies.Include(c => c.FromCurrency).Include(c => c.ToCurrency);
-
-
         }
 
         public IEnumerable<HistoryRateModel> GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId)
