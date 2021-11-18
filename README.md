@@ -25,7 +25,8 @@ In project, we are taking Forex Exchange Rates for chosen currencies by consumin
 
 ### Project Architecture
 
-![dddd](https://user-images.githubusercontent.com/73249548/142181292-f3d4d656-b8c2-49b6-ad39-4530635b367e.png)
+![rr (2) drawio](https://user-images.githubusercontent.com/73249548/142398198-0dca5839-59c2-457f-9048-34c3e7b6cc71.png)
+
 
 
 
