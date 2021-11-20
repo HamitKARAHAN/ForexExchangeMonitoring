@@ -1,6 +1,8 @@
 ﻿using ForexExchangeMonitoring.Application.Interfaces;
 using ForexExchangeMonitoring.Application.ViewModels;
+using ForexExchangeMonitoring.Domain.DbModels;
 using ForexExchangeMonitoring.Domain.Interfaces;
+using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,9 +12,11 @@ namespace ForexExchangeMonitoring.Application.Services
     public class CurrencyService : ICurrencyService
     {
         private readonly ICurrencyRepository _currencyRepository;
-        public CurrencyService(ICurrencyRepository currencyRepository)
+        //private readonly IDistributedCache _distributedCache;
+        public CurrencyService(ICurrencyRepository currencyRepository/*, IDistributedCache distributedCache*/)
         {
             _currencyRepository = currencyRepository;
+            //_distributedCache = distributedCache;
         }
 
         public CurrenciesViewModel GetCurrencies()
@@ -23,8 +27,13 @@ namespace ForexExchangeMonitoring.Application.Services
             };
         }
 
+
+
         public LiveCurrenciesRateViewModel GetLiveCurrenciesBySort(string sortOrder)
         {
+           
+
+
             return new LiveCurrenciesRateViewModel()
             {
                 ForexLiveCurrencies = _currencyRepository.GetLiveCurrenciesBySort(sortOrder)

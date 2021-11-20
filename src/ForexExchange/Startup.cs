@@ -27,6 +27,12 @@ namespace ForexExchange
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            //Redis connection string
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = Configuration.GetConnectionString("redis");
+            });
+            //Db connection string
             services.AddDbContext<ForexCurrencyModelDbContext>(options =>
             {
                 options.UseSqlServer(
@@ -34,7 +40,6 @@ namespace ForexExchange
             });
             services.AddScoped<ICurrencyService, CurrencyService>();
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

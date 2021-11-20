@@ -1,4 +1,5 @@
 ﻿using ForexExchangeMonitoring.Application.ViewModels;
+using ForexExchangeMonitoring.Domain.DbModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

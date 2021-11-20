@@ -94,7 +94,5 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
                                                         .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId) && (c.ToCurrency.CurrencyModelId == toCurrencyModelId) && (c.LastRefreshedDate.Day == now.Day))
                                                         .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
         }
-
-
     }
 }
