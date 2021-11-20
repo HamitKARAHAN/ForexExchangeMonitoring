@@ -26,6 +26,10 @@ namespace ForexExchange.Worker
                     services.AddScoped<ICurrencyRepository, CurrencyRepository>();
                     services.AddDbContext<ForexCurrencyModelDbContext>(options =>
                         options.UseSqlServer(hostContext.Configuration.GetConnectionString("myconn")));
+                    services.AddStackExchangeRedisCache(options =>
+                    {
+                        options.Configuration = hostContext.Configuration.GetConnectionString("redis");
+                    });
 
                 });
     }

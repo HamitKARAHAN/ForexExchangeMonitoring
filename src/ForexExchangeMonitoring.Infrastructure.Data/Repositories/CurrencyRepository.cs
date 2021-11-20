@@ -4,16 +4,20 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
 {
     public class CurrencyRepository : ICurrencyRepository
     {
         private readonly ForexCurrencyModelDbContext _context;
-        public CurrencyRepository(ForexCurrencyModelDbContext context)
+        private readonly IDistributedCache _distributedCache;
+        public CurrencyRepository(ForexCurrencyModelDbContext context, IDistributedCache distributedCache)
         {
             _context = context;
+            _distributedCache = distributedCache;
         }
 
         public void AddLiveExchangeRate(ForexCurrencyRateModel live)
@@ -46,53 +50,150 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
 
         public IEnumerable<ForexCurrencyRateModel> GetLiveCurrenciesBySort(string sortOrder)
         {
-            var liveCurrencies = _context.CurrencyExchangeRatesLive.AsQueryable();
-            return sortOrder switch
-            {
-                "from_desc" => liveCurrencies.OrderByDescending(s => s.FromCurrency.CurrencyName).Include(c => c.FromCurrency).Include(c => c.ToCurrency),
-                "from_asc" => liveCurrencies.OrderBy(s => s.FromCurrency.CurrencyName).Include(c => c.FromCurrency).Include(c => c.ToCurrency),
-                "to_desc" => liveCurrencies.OrderByDescending(s => s.ToCurrency.CurrencyName).Include(c => c.FromCurrency).Include(c => c.ToCurrency),
-                "to_asc" => liveCurrencies.OrderBy(s => s.ToCurrency.CurrencyName).Include(c => c.FromCurrency).Include(c => c.ToCurrency),
-                "rate_desc" => liveCurrencies.OrderByDescending(s => s.ExchangeRate).Include(c => c.FromCurrency).Include(c => c.ToCurrency),
-                "rate_asc" => liveCurrencies.OrderBy(s => s.ExchangeRate).Include(c => c.FromCurrency).Include(c => c.ToCurrency),
-                _ => liveCurrencies.Include(c => c.FromCurrency).Include(c => c.ToCurrency),
-            };
+            var cacheKey = "liveCurrencies_" + sortOrder;
+            var redisCurrenciesList = _distributedCache.Get(cacheKey);
 
+            //Aranan Veri Cache'de var ise
+            if (redisCurrenciesList != null)
+            {
+                string currenciesToString = Encoding.UTF8.GetString(redisCurrenciesList);
+                return JsonConvert.DeserializeObject<IEnumerable<ForexCurrencyRateModel>>(currenciesToString,
+                new JsonSerializerSettings
+                {
+                    PreserveReferencesHandling = PreserveReferencesHandling.Objects
+                });
+            }
+            //Aranan Veri Cache'de Yok ise Db'den getir ve Cache'e Set le
+            else
+            {
+                var liveCurrencies = _context.CurrencyExchangeRatesLive.Include(c => c.FromCurrency).Include(c => c.ToCurrency).AsQueryable();
+                switch (sortOrder)
+                {
+                    case "from_desc":
+                        liveCurrencies = liveCurrencies.OrderByDescending(s => s.FromCurrency.CurrencyName);
+                        break;
+                    case "from_asc":
+                        liveCurrencies = liveCurrencies.OrderBy(s => s.FromCurrency.CurrencyName);
+                        break;
+                    case "to_desc":
+                        liveCurrencies = liveCurrencies.OrderByDescending(s => s.ToCurrency.CurrencyName);
+                        break;
+                    case "to_asc":
+                        liveCurrencies = liveCurrencies.OrderBy(s => s.ToCurrency.CurrencyName);
+                        break;
+                    case "rate_desc":
+                        liveCurrencies = liveCurrencies.OrderByDescending(s => s.ExchangeRate);
+                        break;
+                    case "rate_asc":
+                        liveCurrencies = liveCurrencies.OrderBy(s => s.ExchangeRate);
+                        break;
+                }
+
+                SetCache(liveCurrencies, cacheKey);
+
+                return liveCurrencies;
+            }
         }
         public IEnumerable<ForexCurrencyRateModel> GetLiveCurrenciesBySearch(string from, string to, string min)
         {
-            var liveCurrencies = _context.CurrencyExchangeRatesLive.AsQueryable();
-            if (!String.IsNullOrEmpty(from))
+            double _min;
+            if (Double.TryParse(min, out _min)) { }
+            else { _min = 0; }
+
+            var cacheKey = "liveCurrencies" + "_from_" + (from ?? "all") + "_to_" + (to ?? "all");
+            var redisCurrenciesList = _distributedCache.Get(cacheKey);
+
+            //Aranan Veri Cache'de var ise
+            if (redisCurrenciesList != null)
             {
-                liveCurrencies = liveCurrencies.Where(s => s.FromCurrency.CurrencyName == from);
+                string currenciesToString = Encoding.UTF8.GetString(redisCurrenciesList);
+                var liveCurrencies = JsonConvert.DeserializeObject<IEnumerable<ForexCurrencyRateModel>>(currenciesToString,
+                new JsonSerializerSettings
+                {
+                    PreserveReferencesHandling = PreserveReferencesHandling.Objects
+                }).AsQueryable();
+
+                if (!String.IsNullOrEmpty(min))
+                {
+                    liveCurrencies = liveCurrencies.Where(s => s.ExchangeRate > _min);
+                }
+                return liveCurrencies;
             }
-            if (!String.IsNullOrEmpty(to))
+            //Aranan Veri Cache'de Yok ise Db'den getir ve Cache'e Set le
+            else
             {
-                liveCurrencies = liveCurrencies.Where(s => s.ToCurrency.CurrencyName == to);
+                var liveCurrencies = _context.CurrencyExchangeRatesLive.Include(c => c.FromCurrency).Include(c => c.ToCurrency).AsQueryable();
+                if (!String.IsNullOrEmpty(from))
+                {
+                    liveCurrencies = liveCurrencies.Where(s => s.FromCurrency.CurrencyName == from);
+                }
+                if (!String.IsNullOrEmpty(to))
+                {
+                    liveCurrencies = liveCurrencies.Where(s => s.ToCurrency.CurrencyName == to);
+                }
+                if (!String.IsNullOrEmpty(min))
+                {
+                    liveCurrencies = liveCurrencies.Where(s => s.ExchangeRate > _min);
+                }
+
+                SetCache(liveCurrencies, cacheKey);
+
+                return liveCurrencies;
+
             }
-            if (!String.IsNullOrEmpty(min))
-            {
-                liveCurrencies = liveCurrencies.Where(s => s.ExchangeRate > Double.Parse(min));
-            }
-            return liveCurrencies.Include(c => c.FromCurrency).Include(c => c.ToCurrency);
         }
 
         public IEnumerable<HistoryRateModel> GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId)
         {
-
             DateTime now = DateTime.Now;
 
-            //İstek Gece Saatlerinde Atıldıysa, İstenen Currency için Önceki Günün Tüm History Değerlerini Getir
-            if (now.Hour >= 0 && now.Hour < 9)
+            var cacheKey = "liveCurrencies" + "_fromCurrencyId_" + fromCurrencyModelId + "_toCurrencyId_" + toCurrencyModelId;
+            var redisCurrenciesList = _distributedCache.Get(cacheKey);
+
+            //Aranan Veri Cache'de var ise
+            if (redisCurrenciesList != null)
             {
-                DateTime lastInsertDate = new DateTime(now.Year, now.Month, now.Day - 1, 9, 0, 0);
-                return _context.CurrencyExchangeRatesHistory
-                                                            .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId) && (c.ToCurrency.CurrencyModelId == toCurrencyModelId) && (c.LastRefreshedDate.CompareTo(lastInsertDate) >= 0))
-                                                            .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
+                string currenciesToString = Encoding.UTF8.GetString(redisCurrenciesList);
+                return JsonConvert.DeserializeObject<IEnumerable<HistoryRateModel>>(currenciesToString,
+                new JsonSerializerSettings
+                {
+                    PreserveReferencesHandling = PreserveReferencesHandling.Objects
+                });
             }
-            return _context.CurrencyExchangeRatesHistory
-                                                        .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId) && (c.ToCurrency.CurrencyModelId == toCurrencyModelId) && (c.LastRefreshedDate.Day == now.Day))
-                                                        .Include(c => c.FromCurrency).Include(c => c.ToCurrency);
+            //Aranan Veri Cache'de Yok ise Db'den getir ve Cache'e Set le
+            else
+            {
+                IQueryable<HistoryRateModel> historyOfCurrencies = Enumerable.Empty<HistoryRateModel>().AsQueryable();
+                //İstek Gece Saatlerinde Atıldıysa, İstenen Currency için Önceki Günün Tüm History Değerlerini Getir
+                if (now.Hour >= 0 && now.Hour < 9)
+                {
+                    DateTime lastInsertDate = new(now.Year, now.Month, now.Day - 1, 9, 0, 0);
+                    historyOfCurrencies = _context.CurrencyExchangeRatesHistory
+                                                                             .Include(c => c.FromCurrency).Include(c => c.ToCurrency).Include(c=>c.ForexCurrencyModel)
+                                                                             .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId)
+                                                                                      && (c.ToCurrency.CurrencyModelId == toCurrencyModelId)
+                                                                                      && (c.LastRefreshedDate.CompareTo(lastInsertDate) >= 0));
+                }
+                historyOfCurrencies = _context.CurrencyExchangeRatesHistory
+                                                                          .Include(c => c.FromCurrency).Include(c => c.ToCurrency).Include(c => c.ForexCurrencyModel)
+                                                                          .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId)
+                                                                                   && (c.ToCurrency.CurrencyModelId == toCurrencyModelId)
+                                                                                   && (c.LastRefreshedDate.Day == now.Day));
+                SetCache(historyOfCurrencies, cacheKey);
+                return historyOfCurrencies;
+            }
+        }
+
+        private void SetCache(IQueryable<object> currencies, string cacheKey)
+        {
+            string currenciesToString = JsonConvert.SerializeObject(currencies, Formatting.Indented,
+            new JsonSerializerSettings
+            {
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects
+            });
+            var redisCurrenciesList = Encoding.UTF8.GetBytes(currenciesToString);
+            var options = new DistributedCacheEntryOptions().SetAbsoluteExpiration(DateTime.Now.AddMinutes(30));
+            _distributedCache.Set(cacheKey, redisCurrenciesList, options);
         }
     }
 }

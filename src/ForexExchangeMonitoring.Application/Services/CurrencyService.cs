@@ -12,11 +12,9 @@ namespace ForexExchangeMonitoring.Application.Services
     public class CurrencyService : ICurrencyService
     {
         private readonly ICurrencyRepository _currencyRepository;
-        //private readonly IDistributedCache _distributedCache;
-        public CurrencyService(ICurrencyRepository currencyRepository/*, IDistributedCache distributedCache*/)
+        public CurrencyService(ICurrencyRepository currencyRepository)
         {
             _currencyRepository = currencyRepository;
-            //_distributedCache = distributedCache;
         }
 
         public CurrenciesViewModel GetCurrencies()
@@ -27,18 +25,14 @@ namespace ForexExchangeMonitoring.Application.Services
             };
         }
 
-
-
         public LiveCurrenciesRateViewModel GetLiveCurrenciesBySort(string sortOrder)
         {
-           
-
-
             return new LiveCurrenciesRateViewModel()
             {
                 ForexLiveCurrencies = _currencyRepository.GetLiveCurrenciesBySort(sortOrder)
             };
         }
+
         public LiveCurrenciesRateViewModel GetLiveCurrenciesBySearch(string from, string to, string minRate)
         {
             return new LiveCurrenciesRateViewModel()
@@ -46,6 +40,7 @@ namespace ForexExchangeMonitoring.Application.Services
                 ForexLiveCurrencies = _currencyRepository.GetLiveCurrenciesBySearch(from, to, minRate)
             };
         }
+
         public CurrenciesHistoryRateViewModel GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId)
         {
             return new CurrenciesHistoryRateViewModel()
