@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ForexExchangeMonitoring.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ForexCurrencyModelDbContext))]
-    [Migration("20211120090555_InitialMigration")]
+    [Migration("20211122094053_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

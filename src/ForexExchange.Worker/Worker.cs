@@ -13,6 +13,12 @@ using System.Linq;
 using ForexExchangeMonitoring.Domain.JsonModels;
 using Microsoft.EntityFrameworkCore;
 using ForexExchangeMonitoring.Domain.Interfaces;
+using Vonage.Request;
+using Vonage.Messaging;
+using Vonage;
+//using Vonage.Messaging;
+//using Vonage.Request;
+//using Vonage;
 
 namespace ForexExchange.Worker
 {
@@ -58,6 +64,19 @@ namespace ForexExchange.Worker
                     waitingTime = (int)(Math.Abs((now - (todayMidnight.AddDays(1) + nineHour)).TotalMilliseconds));
                     await Task.Delay(waitingTime);
                 }
+                else
+                {
+                    if (now.Minute<30 && now.Minute!=0)
+                    {
+                        waitingTime = (int)(Math.Abs((now - todayMidnight.AddHours(now.Hour).AddMinutes(30)).TotalMilliseconds));
+                        await Task.Delay(waitingTime);
+                    }
+                    else if (now.Minute>30)
+                    {
+                        waitingTime = (int)(Math.Abs((now - todayMidnight.AddHours(now.Hour+1)).TotalMilliseconds));
+                        await Task.Delay(waitingTime);
+                    }
+                }
             }
             else
             {
@@ -74,7 +93,7 @@ namespace ForexExchange.Worker
             bool isFirstRunning = true;
             while (!stoppingToken.IsCancellationRequested)
             {
-               // await TimeDelay();
+                await TimeDelay();
                 _logger.LogInformation("Worker running at   ===========>   {time}", DateTime.Now);
                 try
                 {
@@ -87,8 +106,19 @@ namespace ForexExchange.Worker
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "An error occurred");
-                    return;
+                    var VONAGE_API_KEY = _configuration.GetConnectionString("Vonage-ApiKey");
+                    var VONAGE_API_SECRET = _configuration.GetConnectionString("Vonage-ApiSecret");
+                    var credentials = Credentials.FromApiKeyAndSecret(VONAGE_API_KEY, VONAGE_API_SECRET);
+                    var client = new SmsClient(credentials);
+                    var request = new SendSmsRequest
+                    {
+                        To = _configuration.GetConnectionString("Vonage-PhoneNumber"),
+                        From = _configuration.GetConnectionString("Vonage-PhoneNumber"),
+                        Text = "FOREX EXCHANGE MONITORING CRASHED !! PLEASE RESTART AGAIN !!"
+                    };
+                    var response = client.SendAnSms(request);
+                    _logger.LogError(ex, "Error occured!! A SMS Sent to : " + response.Messages[0].To + "Remaining Api Bund : " + response.Messages[0].RemainingBalance);
+                    throw;
                 }
             }
         }

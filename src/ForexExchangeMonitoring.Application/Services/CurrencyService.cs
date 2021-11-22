@@ -2,7 +2,6 @@
 using ForexExchangeMonitoring.Application.ViewModels;
 using ForexExchangeMonitoring.Domain.DbModels;
 using ForexExchangeMonitoring.Domain.Interfaces;
-using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

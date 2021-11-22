@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
+    <PackageReference Include="Vonage" Version="5.9.2" />
   </ItemGroup>
 
   <ItemGroup>

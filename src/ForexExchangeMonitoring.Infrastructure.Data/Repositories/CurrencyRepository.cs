@@ -50,6 +50,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
 
         public IEnumerable<ForexCurrencyRateModel> GetLiveCurrenciesBySort(string sortOrder)
         {
+            //SetCacheTime(DateTime.Now);
             var cacheKey = "liveCurrencies_" + sortOrder;
             var redisCurrenciesList = _distributedCache.Get(cacheKey);
 
@@ -88,9 +89,8 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
                         liveCurrencies = liveCurrencies.OrderBy(s => s.ExchangeRate);
                         break;
                 }
-
+                
                 SetCache(liveCurrencies, cacheKey);
-
                 return liveCurrencies;
             }
         }
@@ -135,11 +135,8 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
                 {
                     liveCurrencies = liveCurrencies.Where(s => s.ExchangeRate > _min);
                 }
-
                 SetCache(liveCurrencies, cacheKey);
-
                 return liveCurrencies;
-
             }
         }
 
@@ -169,7 +166,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
                 {
                     DateTime lastInsertDate = new(now.Year, now.Month, now.Day - 1, 9, 0, 0);
                     historyOfCurrencies = _context.CurrencyExchangeRatesHistory
-                                                                             .Include(c => c.FromCurrency).Include(c => c.ToCurrency).Include(c=>c.ForexCurrencyModel)
+                                                                             .Include(c => c.FromCurrency).Include(c => c.ToCurrency).Include(c => c.ForexCurrencyModel)
                                                                              .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId)
                                                                                       && (c.ToCurrency.CurrencyModelId == toCurrencyModelId)
                                                                                       && (c.LastRefreshedDate.CompareTo(lastInsertDate) >= 0));
@@ -185,15 +182,28 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
         }
 
         private void SetCache(IQueryable<object> currencies, string cacheKey)
-        {
+        {     
+            DateTime now = DateTime.Now;
+            if (now.Minute == 30 || now.Minute == 0)
+            {
+                return;
+            }
             string currenciesToString = JsonConvert.SerializeObject(currencies, Formatting.Indented,
             new JsonSerializerSettings
             {
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             });
             var redisCurrenciesList = Encoding.UTF8.GetBytes(currenciesToString);
-            var options = new DistributedCacheEntryOptions().SetAbsoluteExpiration(DateTime.Now.AddMinutes(30));
+            var options = new DistributedCacheEntryOptions().SetSlidingExpiration(SetCacheTime(now));
             _distributedCache.Set(cacheKey, redisCurrenciesList, options);
+        }
+
+        private TimeSpan SetCacheTime(DateTime now)
+        {
+            if (now.Minute < 30)
+                return TimeSpan.FromMinutes(Math.Abs(30 - DateTime.Now.Minute));
+            else
+                return TimeSpan.FromMinutes(Math.Abs(60 - DateTime.Now.Minute));    
         }
     }
 }
