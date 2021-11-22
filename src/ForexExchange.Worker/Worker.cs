@@ -15,10 +15,6 @@ using Microsoft.EntityFrameworkCore;
 using ForexExchangeMonitoring.Domain.Interfaces;
 using Vonage.Request;
 using Vonage.Messaging;
-using Vonage;
-//using Vonage.Messaging;
-//using Vonage.Request;
-//using Vonage;
 
 namespace ForexExchange.Worker
 {

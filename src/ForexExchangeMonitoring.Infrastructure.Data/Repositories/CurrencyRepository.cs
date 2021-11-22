@@ -135,7 +135,10 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
                 {
                     liveCurrencies = liveCurrencies.Where(s => s.ExchangeRate > _min);
                 }
-                SetCache(liveCurrencies, cacheKey);
+                if (liveCurrencies.Any())
+                {
+                    SetCache(liveCurrencies, cacheKey);
+                }
                 return liveCurrencies;
             }
         }
@@ -176,7 +179,10 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
                                                                           .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId)
                                                                                    && (c.ToCurrency.CurrencyModelId == toCurrencyModelId)
                                                                                    && (c.LastRefreshedDate.Day == now.Day));
-                SetCache(historyOfCurrencies, cacheKey);
+                if (historyOfCurrencies.Any())
+                {
+                    SetCache(historyOfCurrencies, cacheKey);
+                }
                 return historyOfCurrencies;
             }
         }
