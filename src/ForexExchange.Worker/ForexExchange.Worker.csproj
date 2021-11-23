@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Log\Log.csproj" />
+    <ProjectReference Include="..\..\Log\Logging.csproj" />
     <ProjectReference Include="..\ForexExchangeMonitoring.Infrastructure.Data\ForexExchangeMonitoring.Infrastructure.Data.csproj" />
   </ItemGroup>
 </Project>

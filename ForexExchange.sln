@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForexExchangeMonitoring.App
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ForexExchange.Worker", "src\ForexExchange.Worker\ForexExchange.Worker.csproj", "{BFFE2242-8E55-43A6-8E07-79FE14316A8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Log", "Log\Log.csproj", "{41BA42DD-0767-4FCA-A001-57F903497B77}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logging", "Log\Logging.csproj", "{41BA42DD-0767-4FCA-A001-57F903497B77}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
