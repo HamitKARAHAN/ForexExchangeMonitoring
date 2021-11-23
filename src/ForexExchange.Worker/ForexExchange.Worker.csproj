@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Worker">
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Log\Logging.csproj" />
+    <ProjectReference Include="..\..\Log\Log.csproj" />
     <ProjectReference Include="..\ForexExchangeMonitoring.Infrastructure.Data\ForexExchangeMonitoring.Infrastructure.Data.csproj" />
   </ItemGroup>
 </Project>
