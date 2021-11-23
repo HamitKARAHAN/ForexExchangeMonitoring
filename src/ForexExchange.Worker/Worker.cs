@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using ForexExchangeMonitoring.Domain.Interfaces;
 using Vonage.Request;
 using Vonage.Messaging;
+using Log;
 
 namespace ForexExchange.Worker
 {
@@ -62,14 +63,14 @@ namespace ForexExchange.Worker
                 }
                 else
                 {
-                    if (now.Minute<30 && now.Minute!=0)
+                    if (now.Minute < 30 && now.Minute != 0)
                     {
                         waitingTime = (int)(Math.Abs((now - todayMidnight.AddHours(now.Hour).AddMinutes(30)).TotalMilliseconds));
                         await Task.Delay(waitingTime);
                     }
-                    else if (now.Minute>30)
+                    else if (now.Minute > 30)
                     {
-                        waitingTime = (int)(Math.Abs((now - todayMidnight.AddHours(now.Hour+1)).TotalMilliseconds));
+                        waitingTime = (int)(Math.Abs((now - todayMidnight.AddHours(now.Hour + 1)).TotalMilliseconds));
                         await Task.Delay(waitingTime);
                     }
                 }
@@ -102,6 +103,7 @@ namespace ForexExchange.Worker
                 }
                 catch (Exception ex)
                 {
+                    #region -- Telefona Mesaj Yolla
                     var VONAGE_API_KEY = _configuration.GetConnectionString("Vonage-ApiKey");
                     var VONAGE_API_SECRET = _configuration.GetConnectionString("Vonage-ApiSecret");
                     var credentials = Credentials.FromApiKeyAndSecret(VONAGE_API_KEY, VONAGE_API_SECRET);
@@ -113,8 +115,16 @@ namespace ForexExchange.Worker
                         Text = "FOREX EXCHANGE MONITORING CRASHED !! PLEASE RESTART AGAIN !!"
                     };
                     var response = client.SendAnSms(request);
-                    _logger.LogError(ex, "Error occured!! A SMS Sent to : " + response.Messages[0].To + "Remaining Api Bund : " + response.Messages[0].RemainingBalance);
-                    throw;
+                    #endregion
+                    LogHelper.Log(
+                        new LogModel 
+                        { 
+                            EventType = Enums.LogType.Error, 
+                            Message = "Worker Crashed", 
+                            Exception = ex,
+                            MessageDetail= "A SMS Sent to : " + response.Messages[0].To + "Remaining Api Bund : " + response.Messages[0].RemainingBalance
+                        });
+                    return;
                 }
             }
         }
@@ -128,7 +138,7 @@ namespace ForexExchange.Worker
                 string responseBody = await response.Content.ReadAsStringAsync();
                 Root jsonModel = JsonConvert.DeserializeObject<Root>(responseBody);
 
-                var currenciesFromDb = _currencyRepository.GetCurrencies();
+                var currenciesFromDb = _currencyRepository.GetCurrencies().ToList();
                 var liveCurrenciesFromDb = _currencyRepository.GetLiveCurrencies().ToList();
 
                 //Program ilk defa çalýþýyorsa

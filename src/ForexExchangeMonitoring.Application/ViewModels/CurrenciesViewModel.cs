@@ -6,6 +6,6 @@ namespace ForexExchangeMonitoring.Application.ViewModels
 {
     public class CurrenciesViewModel
     {
-        public List<CurrencyModel> Currencies { get; set; }
+        public IEnumerable<CurrencyModel> Currencies { get; set; }
     }
 }

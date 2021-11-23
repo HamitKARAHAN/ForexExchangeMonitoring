@@ -13,7 +13,7 @@ namespace ForexExchangeMonitoring.Domain.Interfaces
         public void AddHistoryExchangeRate(HistoryRateModel history);
         public void UpdateDb(ForexCurrencyRateModel live);
         public void SaveToDb();
-        List<CurrencyModel> GetCurrencies();
+        IEnumerable<CurrencyModel> GetCurrencies();
         IEnumerable<ForexCurrencyRateModel> GetLiveCurrencies();
         IEnumerable<ForexCurrencyRateModel> GetLiveCurrenciesBySort(string sortOrder);
         IEnumerable<ForexCurrencyRateModel> GetLiveCurrenciesBySearch(string from, string to, string minRate);

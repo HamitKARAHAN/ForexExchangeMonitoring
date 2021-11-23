@@ -39,9 +39,9 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
             _context.SaveChanges();
         }
 
-        public List<CurrencyModel> GetCurrencies()
+        public IEnumerable<CurrencyModel> GetCurrencies()
         {
-            return _context.Currencies.ToList();
+            return _context.Currencies;
         }
         public IEnumerable<ForexCurrencyRateModel> GetLiveCurrencies()
         {
@@ -50,7 +50,6 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
 
         public IEnumerable<ForexCurrencyRateModel> GetLiveCurrenciesBySort(string sortOrder)
         {
-            //SetCacheTime(DateTime.Now);
             var cacheKey = "liveCurrencies_" + sortOrder;
             var redisCurrenciesList = _distributedCache.Get(cacheKey);
 
@@ -65,34 +64,33 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
                 });
             }
             //Aranan Veri Cache'de Yok ise Db'den getir ve Cache'e Set le
-            else
+
+            var liveCurrencies = _context.CurrencyExchangeRatesLive.Include(c => c.FromCurrency).Include(c => c.ToCurrency).AsQueryable();
+            switch (sortOrder)
             {
-                var liveCurrencies = _context.CurrencyExchangeRatesLive.Include(c => c.FromCurrency).Include(c => c.ToCurrency).AsQueryable();
-                switch (sortOrder)
-                {
-                    case "from_desc":
-                        liveCurrencies = liveCurrencies.OrderByDescending(s => s.FromCurrency.CurrencyName);
-                        break;
-                    case "from_asc":
-                        liveCurrencies = liveCurrencies.OrderBy(s => s.FromCurrency.CurrencyName);
-                        break;
-                    case "to_desc":
-                        liveCurrencies = liveCurrencies.OrderByDescending(s => s.ToCurrency.CurrencyName);
-                        break;
-                    case "to_asc":
-                        liveCurrencies = liveCurrencies.OrderBy(s => s.ToCurrency.CurrencyName);
-                        break;
-                    case "rate_desc":
-                        liveCurrencies = liveCurrencies.OrderByDescending(s => s.ExchangeRate);
-                        break;
-                    case "rate_asc":
-                        liveCurrencies = liveCurrencies.OrderBy(s => s.ExchangeRate);
-                        break;
-                }
-                
-                SetCache(liveCurrencies, cacheKey);
-                return liveCurrencies;
+                case "from_desc":
+                    liveCurrencies = liveCurrencies.OrderByDescending(s => s.FromCurrency.CurrencyName);
+                    break;
+                case "from_asc":
+                    liveCurrencies = liveCurrencies.OrderBy(s => s.FromCurrency.CurrencyName);
+                    break;
+                case "to_desc":
+                    liveCurrencies = liveCurrencies.OrderByDescending(s => s.ToCurrency.CurrencyName);
+                    break;
+                case "to_asc":
+                    liveCurrencies = liveCurrencies.OrderBy(s => s.ToCurrency.CurrencyName);
+                    break;
+                case "rate_desc":
+                    liveCurrencies = liveCurrencies.OrderByDescending(s => s.ExchangeRate);
+                    break;
+                case "rate_asc":
+                    liveCurrencies = liveCurrencies.OrderBy(s => s.ExchangeRate);
+                    break;
             }
+
+            SetCache(liveCurrencies, cacheKey);
+            return liveCurrencies;
+
         }
         public IEnumerable<ForexCurrencyRateModel> GetLiveCurrenciesBySearch(string from, string to, string min)
         {
@@ -102,12 +100,12 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
 
             var cacheKey = "liveCurrencies" + "_from_" + (from ?? "all") + "_to_" + (to ?? "all");
             var redisCurrenciesList = _distributedCache.Get(cacheKey);
-
+            IQueryable<ForexCurrencyRateModel> liveCurrencies = Enumerable.Empty<ForexCurrencyRateModel>().AsQueryable();
             //Aranan Veri Cache'de var ise
             if (redisCurrenciesList != null)
             {
                 string currenciesToString = Encoding.UTF8.GetString(redisCurrenciesList);
-                var liveCurrencies = JsonConvert.DeserializeObject<IEnumerable<ForexCurrencyRateModel>>(currenciesToString,
+                liveCurrencies = JsonConvert.DeserializeObject<IEnumerable<ForexCurrencyRateModel>>(currenciesToString,
                 new JsonSerializerSettings
                 {
                     PreserveReferencesHandling = PreserveReferencesHandling.Objects
@@ -120,27 +118,26 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
                 return liveCurrencies;
             }
             //Aranan Veri Cache'de Yok ise Db'den getir ve Cache'e Set le
-            else
+
+            liveCurrencies = _context.CurrencyExchangeRatesLive.Include(c => c.FromCurrency).Include(c => c.ToCurrency).AsQueryable();
+            if (!String.IsNullOrEmpty(from))
             {
-                var liveCurrencies = _context.CurrencyExchangeRatesLive.Include(c => c.FromCurrency).Include(c => c.ToCurrency).AsQueryable();
-                if (!String.IsNullOrEmpty(from))
-                {
-                    liveCurrencies = liveCurrencies.Where(s => s.FromCurrency.CurrencyName == from);
-                }
-                if (!String.IsNullOrEmpty(to))
-                {
-                    liveCurrencies = liveCurrencies.Where(s => s.ToCurrency.CurrencyName == to);
-                }
-                if (!String.IsNullOrEmpty(min))
-                {
-                    liveCurrencies = liveCurrencies.Where(s => s.ExchangeRate > _min);
-                }
-                if (liveCurrencies.Any())
-                {
-                    SetCache(liveCurrencies, cacheKey);
-                }
-                return liveCurrencies;
+                liveCurrencies = liveCurrencies.Where(s => s.FromCurrency.CurrencyName == from);
             }
+            if (!String.IsNullOrEmpty(to))
+            {
+                liveCurrencies = liveCurrencies.Where(s => s.ToCurrency.CurrencyName == to);
+            }
+            if (!String.IsNullOrEmpty(min))
+            {
+                liveCurrencies = liveCurrencies.Where(s => s.ExchangeRate > _min);
+            }
+            if (liveCurrencies.Any())
+            {
+                SetCache(liveCurrencies, cacheKey);
+            }
+            return liveCurrencies;
+
         }
 
         public IEnumerable<HistoryRateModel> GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId)
@@ -161,34 +158,33 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
                 });
             }
             //Aranan Veri Cache'de Yok ise Db'den getir ve Cache'e Set le
-            else
+
+            IQueryable<HistoryRateModel> historyOfCurrencies = Enumerable.Empty<HistoryRateModel>().AsQueryable();
+            //İstek Gece Saatlerinde Atıldıysa, İstenen Currency için Önceki Günün Tüm History Değerlerini Getir
+            if (now.Hour >= 0 && now.Hour < 9)
             {
-                IQueryable<HistoryRateModel> historyOfCurrencies = Enumerable.Empty<HistoryRateModel>().AsQueryable();
-                //İstek Gece Saatlerinde Atıldıysa, İstenen Currency için Önceki Günün Tüm History Değerlerini Getir
-                if (now.Hour >= 0 && now.Hour < 9)
-                {
-                    DateTime lastInsertDate = new(now.Year, now.Month, now.Day - 1, 9, 0, 0);
-                    historyOfCurrencies = _context.CurrencyExchangeRatesHistory
-                                                                             .Include(c => c.FromCurrency).Include(c => c.ToCurrency).Include(c => c.ForexCurrencyModel)
-                                                                             .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId)
-                                                                                      && (c.ToCurrency.CurrencyModelId == toCurrencyModelId)
-                                                                                      && (c.LastRefreshedDate.CompareTo(lastInsertDate) >= 0));
-                }
+                DateTime lastInsertDate = new(now.Year, now.Month, now.Day - 1, 9, 0, 0);
                 historyOfCurrencies = _context.CurrencyExchangeRatesHistory
-                                                                          .Include(c => c.FromCurrency).Include(c => c.ToCurrency).Include(c => c.ForexCurrencyModel)
-                                                                          .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId)
-                                                                                   && (c.ToCurrency.CurrencyModelId == toCurrencyModelId)
-                                                                                   && (c.LastRefreshedDate.Day == now.Day));
-                if (historyOfCurrencies.Any())
-                {
-                    SetCache(historyOfCurrencies, cacheKey);
-                }
-                return historyOfCurrencies;
+                                                                         .Include(c => c.FromCurrency).Include(c => c.ToCurrency).Include(c => c.ForexCurrencyModel)
+                                                                         .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId)
+                                                                                  && (c.ToCurrency.CurrencyModelId == toCurrencyModelId)
+                                                                                  && (c.LastRefreshedDate.CompareTo(lastInsertDate) >= 0));
             }
+            historyOfCurrencies = _context.CurrencyExchangeRatesHistory
+                                                                      .Include(c => c.FromCurrency).Include(c => c.ToCurrency).Include(c => c.ForexCurrencyModel)
+                                                                      .Where(c => (c.FromCurrency.CurrencyModelId == fromCurrencyModelId)
+                                                                               && (c.ToCurrency.CurrencyModelId == toCurrencyModelId)
+                                                                               && (c.LastRefreshedDate.Day == now.Day));
+            if (historyOfCurrencies.Any())
+            {
+                SetCache(historyOfCurrencies, cacheKey);
+            }
+            return historyOfCurrencies;
+
         }
 
         private void SetCache(IQueryable<object> currencies, string cacheKey)
-        {     
+        {
             DateTime now = DateTime.Now;
             if (now.Minute == 30 || now.Minute == 0)
             {
@@ -209,7 +205,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
             if (now.Minute < 30)
                 return TimeSpan.FromMinutes(Math.Abs(30 - DateTime.Now.Minute));
             else
-                return TimeSpan.FromMinutes(Math.Abs(60 - DateTime.Now.Minute));    
+                return TimeSpan.FromMinutes(Math.Abs(60 - DateTime.Now.Minute));
         }
     }
 }
