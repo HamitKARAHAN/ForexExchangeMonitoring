@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Log\Log.csproj" />
     <ProjectReference Include="..\ForexExchangeMonitoring.Domain\ForexExchangeMonitoring.Domain.csproj" />
+    <ProjectReference Include="..\Log\Log.csproj" />
   </ItemGroup>
 
 </Project>
