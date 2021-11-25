@@ -185,7 +185,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
         {
             DateTime now = DateTime.Now;
 
-            var cacheKey = "liveCurrencies" + "_fromCurrencyId_" + fromCurrencyModelId + "_toCurrencyId_" + toCurrencyModelId;
+            var cacheKey = "history" + "_fromCurrencyId_" + fromCurrencyModelId + "_toCurrencyId_" + toCurrencyModelId;
             IQueryable<HistoryRateModel> historyOfCurrencies = Enumerable.Empty<HistoryRateModel>().AsQueryable();
             try
             {
@@ -237,7 +237,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
                 {
                     PreserveReferencesHandling = PreserveReferencesHandling.Objects
                 });
-                var options = new DistributedCacheEntryOptions().SetSlidingExpiration(SetCacheTime());
+                var options = new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = SetCacheTime() };
                 _distributedCache.SetString(cacheKey, currenciesToString, options);
             }
             catch (Exception ex)
@@ -248,11 +248,32 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
 
         private TimeSpan SetCacheTime()
         {
-            DateTime now = DateTime.Now;
-            if (now.Minute < 30)
-                return TimeSpan.FromMinutes(Math.Abs(30 - now.Minute - 1)) + TimeSpan.FromSeconds(Math.Abs(60 - now.Second)) - TimeSpan.FromSeconds(10);
+            DateTime now = DateTime.Now;                    //Şuan
+            DateTime todayMidnight = DateTime.Today;        //Bugün saat 00:00
+            int dayToday = (int)now.DayOfWeek;              //Haftanın kaçıncı günü?
+            TimeSpan nineHour = TimeSpan.FromHours(9);      //9 saatlik süre
+            TimeSpan tenSecond = TimeSpan.FromSeconds(10);
+
+            if (dayToday < 6)
+            {
+                if (now.Hour < 9)
+                    return (((todayMidnight + nineHour) - now) - tenSecond);
+                else if (now.Hour >= 18)
+                {
+                    if (dayToday == 5)
+                        return (((todayMidnight.AddDays(3) + nineHour) - now) - tenSecond);    
+                    return (((todayMidnight.AddDays(1) + nineHour) - now) - tenSecond);
+                }
+                if (now.Minute < 30)
+                    return ((todayMidnight.AddHours(now.Hour).AddMinutes(30) - now) - tenSecond);
+                else
+                    return ((todayMidnight.AddHours(now.Hour + 1) - now) - tenSecond);
+            }
             else
-                return TimeSpan.FromMinutes(Math.Abs(60 - now.Minute - 1)) + TimeSpan.FromSeconds(Math.Abs(60 - now.Second)) - TimeSpan.FromSeconds(10);
+            {
+                int daysUntilNextMonday = ((int)DayOfWeek.Monday - dayToday + 7) % 7;
+                return (((todayMidnight.AddDays(daysUntilNextMonday) + nineHour) - now) - tenSecond);
+            }
         }
     }
 }

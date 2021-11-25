@@ -47,9 +47,10 @@ namespace ForexExchange.Worker
                 if (now.Hour < 9)
                 {
                     LogHelper.Log(new LogModel { EventType = Enums.LogType.Warning, Message = "TimeDelay", MessageDetail = "Worker Will Wait Until " + (todayMidnight + nineHour) });
-                                             //(Þimdi - (Bugün saat sabah 9'u getirir))
-                    waitingTime = (int)(Math.Abs((now - (todayMidnight + nineHour)).TotalMilliseconds));  
+                    //(Þimdi - (Bugün saat sabah 9'u getirir))
+                    waitingTime = (int)(Math.Abs((now - (todayMidnight + nineHour)).TotalMilliseconds));
                     await Task.Delay(waitingTime);
+                    return;
                 }
                 else if (now.Hour >= 18 && now.Minute >= 5)
                 {
@@ -57,7 +58,7 @@ namespace ForexExchange.Worker
                     if (dayToday == 5)
                     {
                         LogHelper.Log(new LogModel { EventType = Enums.LogType.Warning, Message = "TimeDelay", MessageDetail = "Worker Will Wait Until " + (todayMidnight.AddDays(3) + nineHour) });
-                                                 //(Þimdi - (Pazartesi saat sabah 9'u getirir))
+                        //(Þimdi - (Pazartesi saat sabah 9'u getirir))
                         waitingTime = (int)(Math.Abs((now - (todayMidnight.AddDays(3) + nineHour)).TotalMilliseconds));
                         await Task.Delay(waitingTime);
                         return;
@@ -67,21 +68,20 @@ namespace ForexExchange.Worker
                     LogHelper.Log(new LogModel { EventType = Enums.LogType.Warning, Message = "TimeDelay", MessageDetail = "Worker Will Wait Until " + (todayMidnight.AddDays(1) + nineHour) });
                     waitingTime = (int)(Math.Abs((now - (todayMidnight.AddDays(1) + nineHour)).TotalMilliseconds));
                     await Task.Delay(waitingTime);
+                    return;
                 }
-                else
+
+                if (now.Minute < 30 && now.Minute != 0)
                 {
-                    if (now.Minute < 30 && now.Minute != 0)
-                    {
-                        LogHelper.Log(new LogModel { EventType = Enums.LogType.Warning, Message = "TimeDelay", MessageDetail = "Worker Will Wait Until " + (todayMidnight.AddHours(now.Hour).AddMinutes(30)) });
-                        waitingTime = (int)(Math.Abs((now - todayMidnight.AddHours(now.Hour).AddMinutes(30)).TotalMilliseconds));
-                        await Task.Delay(waitingTime);
-                    }
-                    else if (now.Minute > 30)
-                    {
-                        LogHelper.Log(new LogModel { EventType = Enums.LogType.Warning, Message = "TimeDelay", MessageDetail = "Worker Will Wait Until " + (todayMidnight.AddHours(now.Hour + 1)) });
-                        waitingTime = (int)(Math.Abs((now - todayMidnight.AddHours(now.Hour + 1)).TotalMilliseconds));
-                        await Task.Delay(waitingTime);
-                    }
+                    LogHelper.Log(new LogModel { EventType = Enums.LogType.Warning, Message = "TimeDelay", MessageDetail = "Worker Will Wait Until " + (todayMidnight.AddHours(now.Hour).AddMinutes(30)) });
+                    waitingTime = (int)(Math.Abs((now - todayMidnight.AddHours(now.Hour).AddMinutes(30)).TotalMilliseconds));
+                    await Task.Delay(waitingTime);
+                }
+                else if (now.Minute > 30)
+                {
+                    LogHelper.Log(new LogModel { EventType = Enums.LogType.Warning, Message = "TimeDelay", MessageDetail = "Worker Will Wait Until " + (todayMidnight.AddHours(now.Hour + 1)) });
+                    waitingTime = (int)(Math.Abs((now - todayMidnight.AddHours(now.Hour + 1)).TotalMilliseconds));
+                    await Task.Delay(waitingTime);
                 }
             }
             else
@@ -158,7 +158,7 @@ namespace ForexExchange.Worker
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Log(new LogModel { EventType = Enums.LogType.Error, Message = "GetForexDatas", Exception = ex, MessageDetail = "Api is Not giving Response "});
+                    LogHelper.Log(new LogModel { EventType = Enums.LogType.Error, Message = "GetForexDatas", Exception = ex, MessageDetail = "Api is Not giving Response " });
                 }
             }
         }
