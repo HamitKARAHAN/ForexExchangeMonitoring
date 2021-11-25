@@ -104,6 +104,7 @@ namespace ForexExchange.Worker
                 _logger.LogInformation("Worker running at   ===========>   {time}", DateTime.Now);
                 try
                 {
+
                     LogHelper.Log(new LogModel { EventType = Enums.LogType.Info, Message = "ExecuteAsync", MessageDetail = "Worker running at   ===========> " + DateTime.Now });
                     using (IServiceScope scope = _serviceProvider.CreateScope())
                     {
@@ -168,6 +169,12 @@ namespace ForexExchange.Worker
             {
                 var liveData = liveCurrenciesFromDb
                     .FirstOrDefault(c => (c.FromCurrency.CurrencyName == item.BaseCurrency) && (c.ToCurrency.CurrencyName == item.QuoteCurrency));
+
+                //RealTime Tablosunundaki sadece geerekli alanlarý güncelle
+                liveData.ExchangeRate = item.Ask;
+                liveData.LastRefreshedDate = jsonModel.RequestedTime.ToLocalTime();
+                _currencyRepository.UpdateDb(liveData);
+
                 HistoryRateModel history = new()
                 {
                     FromCurrencyId = currenciesFromDb.FirstOrDefault(c => c.CurrencyName == item.BaseCurrency).CurrencyModelId,
@@ -180,11 +187,6 @@ namespace ForexExchange.Worker
                 };
                 //History Tablosuna ekle
                 _currencyRepository.AddHistoryExchangeRate(history);
-
-                //RealTime Tablosunundaki sadece geerekli alanlarý güncelle
-                liveData.ExchangeRate = item.Ask;
-                liveData.LastRefreshedDate = jsonModel.RequestedTime.ToLocalTime();
-                _currencyRepository.UpdateDb(liveData);
             }
             //Ýki tabloyu da Kaydet
             _currencyRepository.SaveToDb();

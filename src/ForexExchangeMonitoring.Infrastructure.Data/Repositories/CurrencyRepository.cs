@@ -59,7 +59,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
             {
                 LogHelper.Log(new LogModel { EventType = Enums.LogType.Error, Exception = ex, Message = "GetCurrencies", MessageDetail = "Couldnt get Currencies List" });
                 throw new ArgumentNullException("Couldnt connect to Database");
-            }       
+            }
         }
         public IEnumerable<ForexCurrencyRateModel> GetLiveCurrencies()
         {
@@ -113,8 +113,11 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
                         liveCurrencies = liveCurrencies.OrderBy(s => s.ExchangeRate);
                         break;
                 }
+                if (liveCurrencies.Any())
+                {
+                    SetCache(liveCurrencies, cacheKey);
+                }
 
-                SetCache(liveCurrencies, cacheKey);
                 return liveCurrencies;
             }
             catch (Exception ex)
@@ -134,7 +137,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
 
                 var cacheKey = "liveCurrencies" + "_from_" + (from ?? "all") + "_to_" + (to ?? "all");
                 var redisCurrenciesList = _distributedCache.GetString(cacheKey);
-                
+
                 //Aranan Veri Cache'de var ise
                 if (redisCurrenciesList != null)
                 {
@@ -172,7 +175,7 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
                 return liveCurrencies;
             }
             catch (Exception ex)
-            { 
+            {
                 LogHelper.Log(new LogModel { EventType = Enums.LogType.Error, Exception = ex, Message = "Infrastructure.GetLiveCurrenciesBySearch", MessageDetail = "Live Data Couldnt Found" });
             }
             return liveCurrencies;
@@ -227,19 +230,14 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
 
         private void SetCache(IQueryable<object> currencies, string cacheKey)
         {
-            DateTime now = DateTime.Now;
             try
             {
-                if (now.Minute == 30 || now.Minute == 0)
-                {
-                    return;
-                }
                 string currenciesToString = JsonConvert.SerializeObject(currencies, Formatting.Indented,
                 new JsonSerializerSettings
                 {
                     PreserveReferencesHandling = PreserveReferencesHandling.Objects
                 });
-                var options = new DistributedCacheEntryOptions().SetSlidingExpiration(SetCacheTime(now));
+                var options = new DistributedCacheEntryOptions().SetSlidingExpiration(SetCacheTime());
                 _distributedCache.SetString(cacheKey, currenciesToString, options);
             }
             catch (Exception ex)
@@ -248,12 +246,13 @@ namespace ForexExchangeMonitoring.Infrastructure.Data.Repositories
             }
         }
 
-        private TimeSpan SetCacheTime(DateTime now)
+        private TimeSpan SetCacheTime()
         {
+            DateTime now = DateTime.Now;
             if (now.Minute < 30)
-                return TimeSpan.FromMinutes(Math.Abs(30 - DateTime.Now.Minute));
+                return TimeSpan.FromMinutes(Math.Abs(30 - now.Minute - 1)) + TimeSpan.FromSeconds(Math.Abs(60 - now.Second)) - TimeSpan.FromSeconds(10);
             else
-                return TimeSpan.FromMinutes(Math.Abs(60 - DateTime.Now.Minute));
+                return TimeSpan.FromMinutes(Math.Abs(60 - now.Minute - 1)) + TimeSpan.FromSeconds(Math.Abs(60 - now.Second)) - TimeSpan.FromSeconds(10);
         }
     }
 }
