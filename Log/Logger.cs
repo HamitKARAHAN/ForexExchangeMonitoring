@@ -1,14 +1,13 @@
 ﻿using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Log
 {
     public static class Logger
     {
-
-
         private static readonly JsonSerializerSettings JsonSettingsForLog = new()
         {
             DateFormatString = "yyyy-MM-ddTHH:mm:ss.fffffffzzz",
@@ -37,19 +36,16 @@ namespace Log
                 return;
             Task.Run(() =>
             {
-
                 try
                 {
                     RedisHelper.Db.Publish("log_ui", log);
                 }
                 catch
                 {
-                    //LogSqs(log);
+                    throw new ArgumentNullException("Couldnt Connect to redis server");
                 }
             });
         }
-
-
 
         public static void Redis(LogModel model)
         {

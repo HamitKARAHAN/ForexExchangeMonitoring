@@ -12,8 +12,8 @@ namespace Log
     {
         public LogModel()
         {
-            ApplicationName = "ForexExchange";
-            Application = "ForexExchange.Worker";
+            ApplicationName = "Forex Exchange Monitoring";
+            Application = "ForexExchange.WebApp";
         }
 
         public string ApplicationName { get; private set; }

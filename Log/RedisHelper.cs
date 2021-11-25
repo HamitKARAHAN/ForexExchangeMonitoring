@@ -10,7 +10,7 @@ namespace Log
     internal class RedisHelper
     {
         private static readonly object ObjectLock = new();
-
+        
         private static volatile IDatabase _db;
         public static IDatabase Db
         {
@@ -22,7 +22,7 @@ namespace Log
                     {
                         if (_db == null)
                         {
-                            var redis = ConnectionMultiplexer.Connect("127.0.0.1:6379");
+                            var redis = ConnectionMultiplexer.Connect("logservice.digiturk-test.aws:6379");
                             _db = redis.GetDatabase();
                         }
                     }

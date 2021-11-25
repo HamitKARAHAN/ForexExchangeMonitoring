@@ -13,6 +13,5 @@ namespace ForexExchangeMonitoring.Application.Interfaces
         LiveCurrenciesRateViewModel GetLiveCurrenciesBySort(string sortOrder);
         LiveCurrenciesRateViewModel GetLiveCurrenciesBySearch(string from, string to, string minRate);
         CurrenciesHistoryRateViewModel GetCurrencyHistory(int fromCurrencyModelId, int toCurrencyModelId);
-        CurrenciesViewModel GetCurrencies();
     }
 }

@@ -16,6 +16,7 @@ using ForexExchangeMonitoring.Domain.Interfaces;
 using Vonage.Request;
 using Vonage.Messaging;
 using Log;
+using ForexExchange.Worker.Helpers;
 
 namespace ForexExchange.Worker
 {
@@ -44,20 +45,26 @@ namespace ForexExchange.Worker
             if (dayToday < 6)
             {
                 if (now.Hour < 9)
-                {                            //(Þimdi - (Bugün saat sabah 9'u getirir))
-                    waitingTime = (int)(Math.Abs((now - (todayMidnight + nineHour)).TotalMilliseconds));
+                {
+                    LogHelper.Log(new LogModel { EventType = Enums.LogType.Warning, Message = "TimeDelay", MessageDetail = "Worker Will Wait Until " + (todayMidnight + nineHour) });
+                                             //(Þimdi - (Bugün saat sabah 9'u getirir))
+                    waitingTime = (int)(Math.Abs((now - (todayMidnight + nineHour)).TotalMilliseconds));  
                     await Task.Delay(waitingTime);
                 }
                 else if (now.Hour >= 18 && now.Minute >= 5)
                 {
                     //Eðer Cuma Akþamý ise Pazartesi Saat Sabah 9'a Kadar Bekle
                     if (dayToday == 5)
-                    {                            //(Þimdi - (Pazartesi saat sabah 9'u getirir))
+                    {
+                        LogHelper.Log(new LogModel { EventType = Enums.LogType.Warning, Message = "TimeDelay", MessageDetail = "Worker Will Wait Until " + (todayMidnight.AddDays(3) + nineHour) });
+                                                 //(Þimdi - (Pazartesi saat sabah 9'u getirir))
                         waitingTime = (int)(Math.Abs((now - (todayMidnight.AddDays(3) + nineHour)).TotalMilliseconds));
                         await Task.Delay(waitingTime);
                         return;
                     }
+
                     //Eðer Hafta içi ise Bir Sonraki Gün Saat Sabah 9'a Kadar Bekle
+                    LogHelper.Log(new LogModel { EventType = Enums.LogType.Warning, Message = "TimeDelay", MessageDetail = "Worker Will Wait Until " + (todayMidnight.AddDays(1) + nineHour) });
                     waitingTime = (int)(Math.Abs((now - (todayMidnight.AddDays(1) + nineHour)).TotalMilliseconds));
                     await Task.Delay(waitingTime);
                 }
@@ -65,11 +72,13 @@ namespace ForexExchange.Worker
                 {
                     if (now.Minute < 30 && now.Minute != 0)
                     {
+                        LogHelper.Log(new LogModel { EventType = Enums.LogType.Warning, Message = "TimeDelay", MessageDetail = "Worker Will Wait Until " + (todayMidnight.AddHours(now.Hour).AddMinutes(30)) });
                         waitingTime = (int)(Math.Abs((now - todayMidnight.AddHours(now.Hour).AddMinutes(30)).TotalMilliseconds));
                         await Task.Delay(waitingTime);
                     }
                     else if (now.Minute > 30)
                     {
+                        LogHelper.Log(new LogModel { EventType = Enums.LogType.Warning, Message = "TimeDelay", MessageDetail = "Worker Will Wait Until " + (todayMidnight.AddHours(now.Hour + 1)) });
                         waitingTime = (int)(Math.Abs((now - todayMidnight.AddHours(now.Hour + 1)).TotalMilliseconds));
                         await Task.Delay(waitingTime);
                     }
@@ -79,6 +88,7 @@ namespace ForexExchange.Worker
             {
                 //Eðer Hafta Sonu Herhangi Bir Gün ise Gelecek Pazartesiye kadar bekle
                 int daysUntilNextMonday = ((int)DayOfWeek.Monday - dayToday + 7) % 7;
+                LogHelper.Log(new LogModel { EventType = Enums.LogType.Warning, Message = "TimeDelay", MessageDetail = "Worker Will Wait Until " + (todayMidnight.AddDays(daysUntilNextMonday) + nineHour) });
                 waitingTime = (int)(Math.Abs((now - (todayMidnight.AddDays(daysUntilNextMonday) + nineHour)).TotalMilliseconds));
                 await Task.Delay(waitingTime);
             }
@@ -94,6 +104,7 @@ namespace ForexExchange.Worker
                 _logger.LogInformation("Worker running at   ===========>   {time}", DateTime.Now);
                 try
                 {
+                    LogHelper.Log(new LogModel { EventType = Enums.LogType.Info, Message = "ExecuteAsync", MessageDetail = "Worker running at   ===========> " + DateTime.Now });
                     using (IServiceScope scope = _serviceProvider.CreateScope())
                     {
                         var currencyRepository = scope.ServiceProvider.GetService<ICurrencyRepository>();
@@ -103,7 +114,7 @@ namespace ForexExchange.Worker
                 }
                 catch (Exception ex)
                 {
-                    #region -- Telefona Mesaj Yolla
+                    #region -- Send Message to Phone
                     var VONAGE_API_KEY = _configuration.GetConnectionString("Vonage-ApiKey");
                     var VONAGE_API_SECRET = _configuration.GetConnectionString("Vonage-ApiSecret");
                     var credentials = Credentials.FromApiKeyAndSecret(VONAGE_API_KEY, VONAGE_API_SECRET);
@@ -116,14 +127,7 @@ namespace ForexExchange.Worker
                     };
                     var response = client.SendAnSms(request);
                     #endregion
-                    LogHelper.Log(
-                        new LogModel 
-                        { 
-                            EventType = Enums.LogType.Error, 
-                            Message = "Worker Crashed", 
-                            Exception = ex,
-                            MessageDetail= "A SMS Sent to : " + response.Messages[0].To + "Remaining Api Bund : " + response.Messages[0].RemainingBalance
-                        });
+                    LogHelper.Log(new LogModel { EventType = Enums.LogType.Error, Message = "ExecuteAsync", Exception = ex, MessageDetail = "Worker Crashed. A SMS Sent to : " + response.Messages[0].To + " Remaining Api Bund € : " + response.Messages[0].RemainingBalance });
                     return;
                 }
             }
@@ -131,24 +135,30 @@ namespace ForexExchange.Worker
 
         private async Task GetForexDatas(string QUERY_URL, ICurrencyRepository _currencyRepository, bool isFirstRunning)
         {
-
             using (var _client = new HttpClient())
             {
-                var response = await _client.GetAsync(QUERY_URL);
-                string responseBody = await response.Content.ReadAsStringAsync();
-                Root jsonModel = JsonConvert.DeserializeObject<Root>(responseBody);
-
-                var currenciesFromDb = _currencyRepository.GetCurrencies().ToList();
-                var liveCurrenciesFromDb = _currencyRepository.GetLiveCurrencies().ToList();
-
-                //Program ilk defa çalýþýyorsa
-                if (isFirstRunning)
+                try
                 {
-                    SaveForexDatasFirstTime(_currencyRepository, jsonModel, currenciesFromDb, liveCurrenciesFromDb);
-                    isFirstRunning = false;
+                    var response = await _client.GetAsync(QUERY_URL);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    Root jsonModel = JsonConvert.DeserializeObject<Root>(responseBody);
+
+                    var currenciesFromDb = _currencyRepository.GetCurrencies().ToList();
+                    var liveCurrenciesFromDb = _currencyRepository.GetLiveCurrencies().ToList();
+
+                    //Program ilk defa çalýþýyorsa
+                    if (isFirstRunning)
+                    {
+                        SaveForexDatasFirstTime(_currencyRepository, jsonModel, currenciesFromDb, liveCurrenciesFromDb);
+                        isFirstRunning = false;
+                    }
+                    else
+                        SaveForexDatas(_currencyRepository, jsonModel, currenciesFromDb, liveCurrenciesFromDb);
                 }
-                else
-                    SaveForexDatas(_currencyRepository, jsonModel, currenciesFromDb, liveCurrenciesFromDb);
+                catch (Exception ex)
+                {
+                    LogHelper.Log(new LogModel { EventType = Enums.LogType.Error, Message = "GetForexDatas", Exception = ex, MessageDetail = "Api is Not giving Response "});
+                }
             }
         }
 

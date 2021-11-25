@@ -1,7 +1,11 @@
 ﻿using Log;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace ForexExchange.Worker
+namespace ForexExchangeMonitoring.Application.Helpers
 {
     public static class LogHelper
     {
@@ -12,7 +16,7 @@ namespace ForexExchange.Worker
 
             if (string.IsNullOrWhiteSpace(model.Layer))
             {
-                model.Layer = "Digiturk.Dzdy.Business";
+                model.Layer = "ForexExchange.Application";
             }
 
             model.MachineName = Environment.MachineName;
